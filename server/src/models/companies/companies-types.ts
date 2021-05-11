@@ -10,9 +10,8 @@ export type IAddress = {
 
 export type IGeolocation = {
   type: String
-  cordinates: String[]
+  coordinates: [Number]
 }
-
 export interface ICompanies {
   name: string
   email: string

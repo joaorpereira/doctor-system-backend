@@ -24,8 +24,12 @@ const CompaniesSchema = new Schema({
     number: String,
   },
   geolocation: {
-    type: String,
-    cordinates: Array,
+    type: {
+      type: String,
+    },
+    coordinates: {
+      type: [Number],
+    },
   },
   created_at: {
     type: Date,

@@ -1,19 +1,19 @@
 import { Document, Model } from 'mongoose'
 
 export enum Gender {
-  'MASCULINO',
-  'FEMININO',
+  MASCULINO = 'MASCULINO',
+  FEMININO = 'FEMININO',
 }
 
 export enum Status {
-  'ATIVO',
-  'INATIVO',
+  ATIVO = 'ATIVO',
+  INATIVO = 'INATIVO',
 }
 
 export enum AccountType {
-  'CORRENTE',
-  'SALARIO',
-  'POUPANCA',
+  CORRENTE = 'CORRENTE',
+  SALARIO = 'SALARIO',
+  POUPANCA = 'POUPANCA',
 }
 
 export type IBankAccount = {

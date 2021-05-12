@@ -1,6 +1,5 @@
 import { Request, Response } from 'express'
 import { CompaniesModel } from '../models/companies/companies-model'
-
 class CompaniesController {
   async getCompanyList(req: Request, res: Response) {
     try {

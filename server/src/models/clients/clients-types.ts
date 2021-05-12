@@ -1,13 +1,13 @@
 import { Document, Model } from 'mongoose'
 
 export enum Gender {
-  'MASCULINO',
-  'FEMININO',
+  MASCULINO = 'MASCULINO',
+  FEMININO = 'FEMININO',
 }
 
 export enum Status {
-  'ATIVO',
-  'INATIVO',
+  ATIVO = 'ATIVO',
+  INATIVO = 'INATIVO',
 }
 
 export type IAddress = {

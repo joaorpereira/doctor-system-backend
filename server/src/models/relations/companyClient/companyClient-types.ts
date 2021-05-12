@@ -1,8 +1,8 @@
 import { Document, Model } from 'mongoose'
 
 export enum Status {
-  'ATIVO',
-  'INATIVO',
+  ATIVO = 'ATIVO',
+  INATIVO = 'INATIVO',
 }
 
 export interface ICompanyClient {

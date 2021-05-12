@@ -1,10 +1,9 @@
 import { Document, Model } from 'mongoose'
 
 export enum Status {
-  'ATIVO',
-  'INATIVO',
+  ATIVO = 'ATIVO',
+  INATIVO = 'INATIVO',
 }
-
 export interface ICompanyWorker {
   company_id: string
   worker_id: string
@@ -13,9 +12,6 @@ export interface ICompanyWorker {
   updated_at: Date
 }
 
-export interface ICompanyWorkerDocument
-  extends ICompanyWorker,
-    Document {}
+export interface ICompanyWorkerDocument extends ICompanyWorker, Document {}
 
-export interface ICompanyWorkerModel
-  extends Model<ICompanyWorkerDocument> {}
+export interface ICompanyWorkerModel extends Model<ICompanyWorkerDocument> {}

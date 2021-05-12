@@ -1,8 +1,8 @@
 import { Document, Model } from 'mongoose'
 
 export enum Status {
-  'ATIVO',
-  'INATIVO',
+  ATIVO = "ATIVO",
+  INATIVO = "INATIVO",
 }
 
 export interface IServices {
@@ -12,7 +12,7 @@ export interface IServices {
   service_duration: Number
   service_recurrence: Number
   description: String
-  status: Status
+  status: Status 
   created_at: Date
   updated_at: Date
 }

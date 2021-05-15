@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
 import { CompaniesModel } from '../models/companies/companies-model'
+import { getDistance } from '../services/distance'
 class CompaniesController {
   async getCompanyList(req: Request, res: Response) {
     try {
@@ -12,9 +13,20 @@ class CompaniesController {
 
   async getCompany(req: Request, res: Response) {
     try {
-      const { id } = req.params
-      const company = await CompaniesModel.find({ _id: id })
-      res.status(200).send({ company })
+      const { id, lat: user_lat, lon: user_lon } = req.params
+      let company = await CompaniesModel.findById(id)
+      let distance = 0
+
+      if(company){
+        const company_coord : number[] = Object.values(company.geolocation.coordinates) 
+        distance = getDistance(Number(user_lat), Number(user_lon), company_coord[0], company_coord[1])
+      } else {
+        throw new Error('Empresa não localizada');
+      }
+
+      distance =  parseFloat(distance.toFixed(1));
+     
+      res.status(200).send({ company, distance })
     } catch (error) {
       res.status(404).send({ message: error.message })
     }

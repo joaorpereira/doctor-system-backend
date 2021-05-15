@@ -10,8 +10,6 @@ import busboyBodyParser from 'busboy-body-parser'
 import { connect } from './config/database'
 import router from './routes'
 
-
-
 dotenv.config()
 
 const app: Express = express()

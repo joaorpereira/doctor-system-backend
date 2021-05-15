@@ -10,7 +10,7 @@ export type IAddress = {
 
 export type IGeolocation = {
   type: String
-  coordinates: [Number]
+  coordinates: number[]
 }
 export interface ICompanies {
   name: string
@@ -25,6 +25,8 @@ export interface ICompanies {
   updated_at: Date
 }
 
-export interface ICompaniesDocument extends ICompanies, Document {}
+export interface ICompaniesDocument extends ICompanies, Document {
+  geolocation: IGeolocation
+}
 
 export interface ICompaniesModel extends Model<ICompaniesDocument> {}

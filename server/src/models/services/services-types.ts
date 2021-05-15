@@ -1,10 +1,10 @@
 import { Document, Model } from 'mongoose'
 
 export enum Status {
-  ATIVO = "ATIVO",
-  INATIVO = "INATIVO",
+  ATIVO = 'ATIVO',
+  INATIVO = 'INATIVO',
+  REMOVIDO = 'REMOVIDO',
 }
-
 export interface IServices {
   company_id: string
   title: string
@@ -12,11 +12,13 @@ export interface IServices {
   service_duration: Number
   service_recurrence: Number
   description: String
-  status: Status 
+  status: Status
   created_at: Date
   updated_at: Date
 }
 
-export interface IServicesDocument extends IServices, Document {}
+export interface IServicesDocument extends IServices, Document {
+  _doc: IServices;
+}
 
 export interface IServicesModel extends Model<IServicesDocument> {}

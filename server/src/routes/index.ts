@@ -12,7 +12,7 @@ router.put('/company/:id', CompaniesController.update)
 router.delete('/company/:id', CompaniesController.delete)
 
 // === service ===
-router.post('/service', ServicesController.create)
+router.post('/service', ServicesController.uploadAWS)
 router.get('/service/:id', ServicesController.getServicesList)
 
 export default router

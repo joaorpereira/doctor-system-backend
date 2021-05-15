@@ -9,7 +9,7 @@ const FilesSchema = new Schema({
   model: {
     type: String,
     required: true,
-    enum: ['Services, Companies'],
+    enum: ['Services', 'Companies'],
   },
   folder: {
     type: String,

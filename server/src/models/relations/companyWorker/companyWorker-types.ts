@@ -3,6 +3,7 @@ import { Document, Model } from 'mongoose'
 export enum Status {
   ATIVO = 'ATIVO',
   INATIVO = 'INATIVO',
+  REMOVIDO = 'REMOVIDO'
 }
 export interface ICompanyWorker {
   company_id: string

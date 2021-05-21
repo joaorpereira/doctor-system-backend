@@ -1,10 +1,10 @@
 import { Document, Model } from 'mongoose'
 
 export enum Status {
-  'ATIVO',
-  'INATIVO',
+  ATIVO = 'ATIVO',
+  INATIVO = 'INATIVO',
+  REMOVIDO = 'REMOVIDO',
 }
-
 export interface IWorkerService {
   service_id: string
   worker_id: string
@@ -13,9 +13,6 @@ export interface IWorkerService {
   updated_at: Date
 }
 
-export interface IWorkerServiceDocument
-  extends IWorkerService,
-    Document {}
+export interface IWorkerServiceDocument extends IWorkerService, Document {}
 
-export interface IWorkerServiceModel
-  extends Model<IWorkerServiceDocument> {}
+export interface IWorkerServiceModel extends Model<IWorkerServiceDocument> {}

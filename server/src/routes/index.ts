@@ -2,6 +2,7 @@ import express from 'express'
 import CompaniesController from '../controllers/CompaniesController'
 import FilesController from '../controllers/FilesController'
 import ServicesController from '../controllers/ServicesController'
+import WorkersController from '../controllers/WorkersController'
 
 const router = express.Router()
 
@@ -21,5 +22,13 @@ router.delete('/service/:id/:status', ServicesController.removeInactiveService)
 
 // === file ===
 router.post('/file', FilesController.delete)
+
+// === workers ===
+router.get('/worker', WorkersController.getAllWorkers)
+router.post('/worker', WorkersController.create)
+router.get('/worker/info/:id', WorkersController.getWorker)
+router.get('/worker/:company_id', WorkersController.listWorkersByCompany)
+router.put('/worker/:id', ServicesController.update)
+router.delete('/worker/:id', WorkersController.delete)
 
 export default router

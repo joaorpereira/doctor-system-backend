@@ -6,10 +6,31 @@ import { WorkerServiceModel } from '../models/relations/workerService/workerServ
 import { Status } from '../models/relations/companyWorker/companyWorker-types'
 import { pagarmeService } from '../services/pargar-me'
 import { IWorkers, IBankAccount } from '../models/workers/workers-types'
+import {
+  IWorkerData,
+  ICompanyWorkers,
+} from '../models/relations/workerService/workerService-types'
 
 class WorkersController {
-  async getListWorkers(req: Request, res: Response) {}
-  async getWorker(req: Request, res: Response) {}
+  async getAllWorkers(req: Request, res: Response) {
+    try {
+      const workers = await WorkersModel.find()
+      res.status(200).send({ workers })
+    } catch (error) {
+      res.status(404).send({ message: error.message })
+    }
+  }
+  async getWorker(req: Request, res: Response) {
+    try {
+      const { id } = req.params
+      console.log(id)
+      const worker = await WorkersModel.findById(id)
+
+      res.status(200).send({ worker })
+    } catch (error) {
+      res.status(404).send({ message: error.message })
+    }
+  }
   async create(req: Request, res: Response) {
     const db = mongoose.connection
     const session = await db.startSession()
@@ -20,9 +41,6 @@ class WorkersController {
         company_id,
         worker_data,
       }: { company_id: string; worker_data: IWorkers } = req.body
-
-      // const { email, phone_number, company_id, bank_account, cpf_or_cnpj } =
-      //   req.body
 
       const worker = await WorkersModel.findOne({
         $or: [
@@ -130,8 +148,70 @@ class WorkersController {
         .send({ error: error.message, message: 'Erro ao criar colaborador' })
     }
   }
-  async update(req: Request, res: Response) {}
-  async delete(req: Request, res: Response) {}
+  async update(req: Request, res: Response) {
+    const { id } = req.params
+    const data = req.body
+
+    const update = {
+      password: data.password,
+      picture: data.picture,
+      phone_number: data.phone_number,
+    }
+
+    const company = await WorkersModel.findOneAndUpdate({ _id: id }, update, {
+      returnOriginal: false,
+    })
+
+    res
+      .status(200)
+      .send({ company, message: 'Colaborador alterado com sucesso' })
+  }
+  async delete(req: Request, res: Response) {
+    try {
+      const { id } = req.params
+      WorkersModel.deleteOne({ _id: id })
+      res.status(200).send({ message: 'Colaborador removido com sucesso' })
+    } catch (error) {
+      res.status(404).send({ message: error.message })
+    }
+  }
+
+  async listWorkersByCompany(req: Request, res: Response) {
+    try {
+      const { company_id } = req.params
+      let newListOfWorkers: any = []
+
+      const listWorkersByCompany = await CompanyWorkerModel.find({
+        company_id,
+        status: { $ne: Status['REMOVIDO'] },
+      })
+        .populate({ path: 'worker_id', select: '-password -recipient_id' })
+        .select('worker_id created_at status')
+
+      for (let worker of listWorkersByCompany) {
+        const workerDoc = worker._doc
+        const workerData: IWorkerData = worker.worker_id as any
+        const workerServices = await WorkerServiceModel.find({
+          worker_id: workerData._id,
+        })
+        newListOfWorkers = [{ ...workerDoc, workerServices }]
+      }
+
+      const lifOfWorkers: ICompanyWorkers = newListOfWorkers.map(
+        (item: any) => ({
+          _id: item._id,
+          status: item.status,
+          worker: item.worker_id,
+          services: item.workerServices,
+          created_at: item.created_at,
+        })
+      )
+
+      res.status(200).send({ lifOfWorkers })
+    } catch (error) {
+      res.status(404).send({ error: error.message })
+    }
+  }
 }
 
 export default new WorkersController()

@@ -8,6 +8,7 @@ export enum Gender {
 export enum Status {
   ATIVO = 'ATIVO',
   INATIVO = 'INATIVO',
+  REMOVIDO = 'REMOVIDO',
 }
 
 export enum AccountType {

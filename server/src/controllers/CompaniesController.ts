@@ -74,7 +74,7 @@ class CompaniesController {
   async delete(req: Request, res: Response) {
     try {
       const { id } = req.params
-      CompaniesModel.deleteOne({ _id: id })
+      await CompaniesModel.deleteOne({ _id: id })
       res.status(200).send({ message: 'Empresa removida com sucesso' })
     } catch (error) {
       res.status(404).send({ message: error.message })

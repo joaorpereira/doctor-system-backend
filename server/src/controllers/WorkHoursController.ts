@@ -9,7 +9,9 @@ class WorkHoursController {
       const company_work_hours = await WorkHoursModel.find({ company_id: id })
       res.status(201).send({ company_work_hours })
     } catch (error) {
-      res.status(404).send({ message: 'Erro ao buscar os horários do salão' })
+      res
+        .status(404)
+        .send({ message: 'Erro ao buscar os horários do salão', error })
     }
   }
 
@@ -19,7 +21,7 @@ class WorkHoursController {
       const work_hours = await new WorkHoursModel(data).save()
       res.status(201).send({ work_hours })
     } catch (error) {
-      res.status(404).send({ message: 'Erro ao criar novo horário' })
+      res.status(404).send({ message: 'Erro ao criar novo horário', error })
     }
   }
 
@@ -48,7 +50,19 @@ class WorkHoursController {
         .status(200)
         .send({ work_hours, message: 'Horário alterado com sucesso' })
     } catch (error) {
-      res.status(404).send({ message: 'Não foi possível alterar o horário' })
+      res
+        .status(404)
+        .send({ message: 'Não foi possível alterar o horário', error })
+    }
+  }
+
+  async delete(req: Request, res: Response) {
+    try {
+      const { id } = req.params
+      await WorkHoursModel.deleteOne({ _id: id })
+      res.status(200).send({ message: 'Horário removido com sucesso' })
+    } catch (error) {
+      res.status(404).send({ message: 'Erro ao remover Horário', error })
     }
   }
 }

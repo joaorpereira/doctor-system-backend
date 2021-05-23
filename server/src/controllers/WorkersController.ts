@@ -175,7 +175,6 @@ class WorkersController {
       res.status(404).send({ message: error.message })
     }
   }
-
   async listWorkersByCompany(req: Request, res: Response) {
     try {
       const { company_id } = req.params

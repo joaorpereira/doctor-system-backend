@@ -4,8 +4,8 @@ import { IWorkers } from '../workers/workers-types'
 
 export interface IWorkHours {
   company_id: string
-  services: IServices[]
-  workers: IWorkers[]
+  services: string[]
+  workers: string[]
   days: Number[]
   start_time: Date
   end_time: Date

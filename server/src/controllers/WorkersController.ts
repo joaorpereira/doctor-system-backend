@@ -17,9 +17,10 @@ class WorkersController {
       const workers = await WorkersModel.find()
       res.status(200).send({ workers })
     } catch (error) {
-      res.status(404).send({ message: error.message })
+      res.status(404).send({ message: 'Lista de colaboradores não encontrada', error })
     }
   }
+
   async getWorker(req: Request, res: Response) {
     try {
       const { id } = req.params
@@ -28,9 +29,10 @@ class WorkersController {
 
       res.status(200).send({ worker })
     } catch (error) {
-      res.status(404).send({ message: error.message })
+      res.status(404).send({ message: 'Colaborador não encontrado', error })
     }
   }
+
   async create(req: Request, res: Response) {
     const db = mongoose.connection
     const session = await db.startSession()
@@ -143,38 +145,42 @@ class WorkersController {
     } catch (error) {
       await session.abortTransaction()
       session.endSession()
-      res
-        .status(404)
-        .send({ error: error.message, message: 'Erro ao criar colaborador' })
+      res.status(404).send({ message: 'Erro ao criar colaborador', error })
     }
   }
+
   async update(req: Request, res: Response) {
     const { id } = req.params
     const data = req.body
+    try {
+      const update = {
+        password: data.password,
+        picture: data.picture,
+        phone_number: data.phone_number,
+      }
 
-    const update = {
-      password: data.password,
-      picture: data.picture,
-      phone_number: data.phone_number,
+      const company = await WorkersModel.findOneAndUpdate({ _id: id }, update, {
+        returnOriginal: false,
+      })
+
+      res
+        .status(200)
+        .send({ company, message: 'Colaborador alterado com sucesso' })
+    } catch (error) {
+      res.status(404).send({ message: 'Erro ao alterar colaborador' })
     }
-
-    const company = await WorkersModel.findOneAndUpdate({ _id: id }, update, {
-      returnOriginal: false,
-    })
-
-    res
-      .status(200)
-      .send({ company, message: 'Colaborador alterado com sucesso' })
   }
+
   async delete(req: Request, res: Response) {
     try {
       const { id } = req.params
       WorkersModel.deleteOne({ _id: id })
       res.status(200).send({ message: 'Colaborador removido com sucesso' })
     } catch (error) {
-      res.status(404).send({ message: error.message })
+      res.status(404).send({ message: 'Erro ao remover colaborador', error })
     }
   }
+
   async listWorkersByCompany(req: Request, res: Response) {
     try {
       const { company_id } = req.params
@@ -208,7 +214,7 @@ class WorkersController {
 
       res.status(200).send({ lifOfWorkers })
     } catch (error) {
-      res.status(404).send({ error: error.message })
+      res.status(404).send({ message: "Lista de colaboradores não encontrada", error })
     }
   }
 }

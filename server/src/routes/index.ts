@@ -34,5 +34,7 @@ router.delete('/worker/:id', WorkersController.delete)
 
 // === workHours ===
 router.post('/work-hours', WorkHoursController.create)
+router.get('/work-hours/:id', WorkHoursController.getWorkHoursByCompany)
+router.put('/work-hours/:id', WorkHoursController.update)
 
 export default router

@@ -1,6 +1,7 @@
 import express from 'express'
 import CompaniesController from '../controllers/CompaniesController'
 import FilesController from '../controllers/FilesController'
+import WorkHoursController from '../controllers/WorkHoursController'
 import ServicesController from '../controllers/ServicesController'
 import WorkersController from '../controllers/WorkersController'
 
@@ -20,15 +21,18 @@ router.get('/service/filter/:id', ServicesController.getFilteredServicesList)
 router.put('/service/:id', ServicesController.update)
 router.delete('/service/:id/:status', ServicesController.removeInactiveService)
 
-// === file ===
+// === files ===
 router.post('/file', FilesController.delete)
 
-// === workers ===
+// === worker ===
 router.get('/worker', WorkersController.getAllWorkers)
 router.post('/worker', WorkersController.create)
 router.get('/worker/info/:id', WorkersController.getWorker)
 router.get('/worker/:company_id', WorkersController.listWorkersByCompany)
 router.put('/worker/:id', ServicesController.update)
 router.delete('/worker/:id', WorkersController.delete)
+
+// === workHours ===
+router.post('/work-hours', WorkHoursController.create)
 
 export default router

@@ -63,6 +63,7 @@ class WorkHoursController {
       const data: IWorkHoursBody = req.body
 
       const update = {
+        ...data,
         services: data.services && data.services,
         workers: data.workers && data.workers,
         days: data.days && data.days,

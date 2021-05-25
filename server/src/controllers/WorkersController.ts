@@ -154,9 +154,10 @@ class WorkersController {
     const data = req.body
     try {
       const update = {
-        password: data.password,
-        picture: data.picture,
-        phone_number: data.phone_number,
+        ...data,
+        password: data.password && data.password,
+        picture: data.picture && data.picture,
+        phone_number: data.phone_number && data.phone_number,
       }
 
       const company = await WorkersModel.findOneAndUpdate({ _id: id }, update, {

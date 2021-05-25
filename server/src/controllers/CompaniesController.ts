@@ -47,14 +47,14 @@ class CompaniesController {
       const data = req.body
 
       const update = {
-        name: data.name,
-        password: data.password,
-        email: data.email,
-        picture: data.picture,
-        background: data.background,
-        phone_number: data.phone_number,
-        geolocation: data.geolocation,
-        address: data.address,
+        ...data,
+        name: data.name && data.name ,
+        password: data.password && data.password,
+        picture: data.picture && data.picture,
+        background: data.background && data.background,
+        phone_number: data.phone_number && data.phone_number,
+        geolocation: data.geolocation && data.geolocation,
+        address: data.address && data.address,
       }
 
       const company = await CompaniesModel.findOneAndUpdate(

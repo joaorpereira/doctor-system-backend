@@ -30,10 +30,17 @@ const ClientsSchema = new Schema({
     required: true,
     default: 'ATIVO',
   },
-  cpf_or_cnpj: {
-    type: String,
-    required: true,
-    unique: [true, 'CPF/CNPJ já cadastrado'],
+  document: {
+    type: {
+      type: String,
+      enum: ['cpf', 'cnpj'],
+      required: true,
+    },
+    cpf_or_cnpj: {
+      type: String,
+      required: true,
+      unique: [true, 'CPF/CNPJ já cadastrado'],
+    },
   },
   address: {
     country: {
@@ -57,6 +64,7 @@ const ClientsSchema = new Schema({
       required: true,
     },
   },
+  customer_id:  String,
   created_at: {
     type: Date,
     default: new Date(),
@@ -65,6 +73,7 @@ const ClientsSchema = new Schema({
     type: Date,
     default: new Date(),
   },
+
 })
 
 export default ClientsSchema

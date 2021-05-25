@@ -174,7 +174,7 @@ class WorkersController {
   async delete(req: Request, res: Response) {
     try {
       const { id } = req.params
-      WorkersModel.deleteOne({ _id: id })
+      await WorkersModel.deleteOne({ _id: id })
       res.status(200).send({ message: 'Colaborador removido com sucesso' })
     } catch (error) {
       res.status(404).send({ message: 'Erro ao remover colaborador', error })

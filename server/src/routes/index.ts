@@ -26,8 +26,8 @@ router.delete('/service/:id/:status', ServicesController.removeInactiveService)
 router.post('/file', FilesController.delete)
 
 // === worker ===
-router.get('/worker', WorkersController.getAllWorkers)
 router.post('/worker', WorkersController.create)
+router.get('/worker', WorkersController.getAllWorkers)
 router.get('/worker/info/:id', WorkersController.getWorker)
 router.get('/worker/:company_id', WorkersController.listWorkersByCompany)
 router.put('/worker/:id', WorkersController.update)
@@ -41,8 +41,9 @@ router.put('/work-hours/:id', WorkHoursController.update)
 router.delete('/work-hours/:id', WorkHoursController.delete)
 
 // === client ===
-router.get('/client', ClientsControllers.getAllClients)
 router.post('/client', ClientsControllers.create)
+router.post('/client/filter', ClientsControllers.filteredClientList)
+router.get('/client', ClientsControllers.getAllClients)
 router.get('/client/:id', ClientsControllers.getClient)
 router.put('/client/:id', ClientsControllers.update)
 router.delete('/client/:id', ClientsControllers.delete)

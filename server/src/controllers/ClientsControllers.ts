@@ -29,6 +29,17 @@ class ClientsControllers {
     }
   }
 
+  async filteredClientList(req: Request, res: Response) {
+    try {
+      const { filters } = req.body
+      const clients = await ClientsModel.find(filters)
+
+      res.status(200).send({ clients, message: 'Lista de clientes encontrada' })
+    } catch (error) {
+      res.status(404).send({ message: 'Cliente não encontrado', error })
+    }
+  }
+
   async create(req: Request, res: Response) {
     const db = mongoose.connection
     const session = await db.startSession()

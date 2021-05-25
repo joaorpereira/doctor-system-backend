@@ -4,6 +4,7 @@ import FilesController from '../controllers/FilesController'
 import WorkHoursController from '../controllers/WorkHoursController'
 import ServicesController from '../controllers/ServicesController'
 import WorkersController from '../controllers/WorkersController'
+import ClientsControllers from '../controllers/ClientsControllers'
 
 const router = express.Router()
 
@@ -29,7 +30,7 @@ router.get('/worker', WorkersController.getAllWorkers)
 router.post('/worker', WorkersController.create)
 router.get('/worker/info/:id', WorkersController.getWorker)
 router.get('/worker/:company_id', WorkersController.listWorkersByCompany)
-router.put('/worker/:id', ServicesController.update)
+router.put('/worker/:id', WorkersController.update)
 router.delete('/worker/:id', WorkersController.delete)
 
 // === workHours ===
@@ -38,5 +39,12 @@ router.post('/work-hours/service', WorkHoursController.getWorkerHoursByService)
 router.get('/work-hours/:id', WorkHoursController.getWorkHoursByCompany)
 router.put('/work-hours/:id', WorkHoursController.update)
 router.delete('/work-hours/:id', WorkHoursController.delete)
+
+// === client ===
+router.get('/client', ClientsControllers.getAllClients)
+router.post('/client', ClientsControllers.create)
+router.get('/client/:id', ClientsControllers.getClient)
+router.put('/client/:id', ClientsControllers.update)
+router.delete('/client/:id', ClientsControllers.delete)
 
 export default router

@@ -135,9 +135,11 @@ class ClientsControllers {
     const data = req.body
     try {
       const update = {
-        password: data.password,
-        picture: data.picture,
-        phone_number: data.phone_number,
+        ...data,
+        password: data.password && data.password,
+        picture: data.picture && data.picture,
+        phone_number: data.phone_number && data.phone_number,
+        address: data.address && data.address,
       }
 
       const client = await ClientsModel.findOneAndUpdate({ _id: id }, update, {

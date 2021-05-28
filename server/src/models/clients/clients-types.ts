@@ -26,6 +26,7 @@ export type IAddress = {
   city: String
   cep: String
   number: String
+  street: String
 }
 export interface IClients {
   name: string

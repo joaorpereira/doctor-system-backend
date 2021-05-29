@@ -6,6 +6,11 @@ const schedule = new Schema({
     ref: 'Companies',
     required: true,
   },
+  client_id: {
+    type: mongoose.Types.ObjectId,
+    ref: 'Clients',
+    required: true,
+  },
   service_id: {
     type: mongoose.Types.ObjectId,
     ref: 'Services',

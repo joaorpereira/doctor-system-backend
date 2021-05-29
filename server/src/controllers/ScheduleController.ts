@@ -1,5 +1,9 @@
 import mongoose from 'mongoose'
+import dotenv from 'dotenv'
 import { Request, Response } from 'express'
+
+dotenv.config()
+
 import { pagarmeService } from '../services/pargar-me'
 import { ClientsModel } from '../models/clients/clients-model'
 import { ServicesModel } from '../models/services/services-model'
@@ -12,12 +16,15 @@ type CreateParams = {
   worker_id: string
   client_id: string
   service_id: string
-  date: string
+  schedule_date: Date
 }
 
-type IRange = {
-  start: Date
-  end: Date
+type IFilter = {
+  range: {
+    start: Date
+    end: Date
+  }
+  company_id: string
 }
 
 class ScheduleController {
@@ -25,8 +32,7 @@ class ScheduleController {
 
   async filterScheduleList(req: Request, res: Response) {
     try {
-      const { range, company_id }: { range: IRange; company_id: string } =
-        req.body
+      const { range, company_id } : IFilter = req.body
 
       const schedules = await ScheduleModel.find({
         company_id: company_id,
@@ -41,7 +47,7 @@ class ScheduleController {
       ])
       res.status(200).send({ schedules })
     } catch (error) {
-      res.status(404).send({ message: 'Erro ao filtrar horário', error })
+      res.status(404).send({ message: 'Erro ao filtrar horário', error: error.message })
     }
   }
 
@@ -49,12 +55,18 @@ class ScheduleController {
     const db = mongoose.connection
     const session = await db.startSession()
     session.startTransaction()
+
     try {
-      const { company_id, worker_id, client_id, service_id, date } =
-        req.query as CreateParams
+      const {
+        company_id,
+        worker_id,
+        client_id,
+        service_id,
+        schedule_date,
+      }: CreateParams = req.body
 
       const client = await ClientsModel.findById(client_id).select(
-        'name address customer_id'
+        'name email address customer_id document phone_number'
       )
 
       const worker = await WorkersModel.findById(worker_id).select(
@@ -72,12 +84,13 @@ class ScheduleController {
       const finalPrice = Number(service?.price)
 
       const workerPrice = finalPrice * 0.65
-
       const companyPrice = finalPrice * 0.25
-
       const appPrice = finalPrice * 0.1
 
-      const createPayment: any = await pagarmeService('/transaction', {
+      const zipCode =
+        client && (client.address.cep.split('-').join('') as string)
+
+      const createPayment: any = await pagarmeService('/transactions', {
         amount: finalPrice,
 
         card_number: '4111111111111111',
@@ -86,21 +99,31 @@ class ScheduleController {
         card_holder_name: 'Morpheus Fishburne',
 
         customer: {
-          id: client?.customer_id,
+          external_id: client?.customer_id,
+          name: client?.name,
+          email: client?.email,
+          country: 'br',
+          type: client?.document.type === 'cpf' ? 'individual' : 'corporation',
+          documents: [
+            {
+              type: client?.document.type,
+              number: String(client?.document.number),
+            },
+          ],
+          phone_numbers: [client?.phone_number],
         },
 
         billing: {
           name: client?.name,
           address: {
-            country: client?.address.country,
+            country: 'br',
             state: client?.address.state,
             city: client?.address.city,
             street: client?.address.street,
             street_number: client?.address.number,
-            zipcode: client?.address.cep,
+            zipcode: zipCode,
           },
         },
-
         items: [
           {
             id: service_id,
@@ -120,32 +143,38 @@ class ScheduleController {
             amount: workerPrice,
           },
           {
-            recipient_id: company?.recipient_id,
+            recipient_id: 're_ckp9zscoq04a40h9t73nhserw',
             amount: appPrice,
           },
         ],
       })
 
-      if (createPayment.error) {
-        throw new Error(createPayment)
+      if (createPayment.message) {
+        throw createPayment as string
       }
 
       const schedule = await new ScheduleModel({
-        company_id,
-        client_id,
-        worker_id,
-        schedule_date: date,
-        price: service?.price,
-        transaction_id: createPayment.data.id,
+        company_id: company_id,
+        client_id: client_id,
+        worker_id: worker_id,
+        service_id: service_id,
+        schedule_date: schedule_date,
+        price: finalPrice,
+        transaction_id: createPayment?.data?.id as string,
       }).save({
         session,
       })
+
+      await session.commitTransaction()
+      session.endSession()
 
       res.status(201).send({ schedule, message: 'Horário criado com sucesso' })
     } catch (error) {
       await session.abortTransaction()
       session.endSession()
-      res.status(404).send({ message: 'Erro ao criar horário', error })
+      res
+        .status(404)
+        .send({ message: 'Erro ao criar horário', error: error.message })
     }
   }
   async update(req: Request, res: Response) {}

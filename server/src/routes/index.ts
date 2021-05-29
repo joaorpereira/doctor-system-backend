@@ -5,6 +5,7 @@ import WorkHoursController from '../controllers/WorkHoursController'
 import ServicesController from '../controllers/ServicesController'
 import WorkersController from '../controllers/WorkersController'
 import ClientsControllers from '../controllers/ClientsControllers'
+import ScheduleController from '../controllers/ScheduleController'
 
 const router = express.Router()
 
@@ -47,5 +48,9 @@ router.get('/client', ClientsControllers.getAllClients)
 router.get('/client/:id', ClientsControllers.getClient)
 router.put('/client/:id', ClientsControllers.update)
 router.delete('/client/:id', ClientsControllers.delete)
+
+// === schedule ===
+router.post('/schedule', ScheduleController.create)
+router.post('/schedule/filter', ScheduleController.filterScheduleList)
 
 export default router

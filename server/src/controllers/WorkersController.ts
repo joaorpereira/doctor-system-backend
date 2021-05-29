@@ -17,7 +17,9 @@ class WorkersController {
       const workers = await WorkersModel.find()
       res.status(200).send({ workers })
     } catch (error) {
-      res.status(404).send({ message: 'Lista de colaboradores não encontrada', error })
+      res
+        .status(404)
+        .send({ message: 'Lista de colaboradores não encontrada', error })
     }
   }
 
@@ -37,6 +39,8 @@ class WorkersController {
     const db = mongoose.connection
     const session = await db.startSession()
     session.startTransaction()
+
+    let message = 'Erro ao criar colaborador'
 
     try {
       const {
@@ -135,7 +139,8 @@ class WorkersController {
       session.endSession()
 
       if (worker && verifyRelationship) {
-        throw new Error('Colaborador já cadastrado')
+        message = 'Colaborador já cadastrado'
+        throw new Error(message)
       } else {
         res.status(201).send({
           worker: worker ?? newWorker,
@@ -145,7 +150,7 @@ class WorkersController {
     } catch (error) {
       await session.abortTransaction()
       session.endSession()
-      res.status(404).send({ message: 'Erro ao criar colaborador', error })
+      res.status(404).send({ message, error: error.message })
     }
   }
 
@@ -168,7 +173,9 @@ class WorkersController {
         .status(200)
         .send({ company, message: 'Colaborador alterado com sucesso' })
     } catch (error) {
-      res.status(404).send({ message: 'Erro ao alterar colaborador' })
+      res
+        .status(404)
+        .send({ message: 'Erro ao alterar colaborador', error: error.message })
     }
   }
 
@@ -178,7 +185,9 @@ class WorkersController {
       await WorkersModel.deleteOne({ _id: id })
       res.status(200).send({ message: 'Colaborador removido com sucesso' })
     } catch (error) {
-      res.status(404).send({ message: 'Erro ao remover colaborador', error })
+      res
+        .status(404)
+        .send({ message: 'Erro ao remover colaborador', error: error.message })
     }
   }
 
@@ -215,7 +224,12 @@ class WorkersController {
 
       res.status(200).send({ lifOfWorkers })
     } catch (error) {
-      res.status(404).send({ message: "Lista de colaboradores não encontrada", error })
+      res
+        .status(404)
+        .send({
+          message: 'Lista de colaboradores não encontrada',
+          error: error.message,
+        })
     }
   }
 }

@@ -12,7 +12,6 @@ interface IBusboyRequest extends Request {
 interface IErrorAWS {
   error: string
 }
-
 class ServicesController {
   async getServicesList(req: Request, res: Response) {
     try {
@@ -21,17 +20,17 @@ class ServicesController {
 
       const services = await ServicesModel.find({
         company_id: id,
-        status: { $ne: Status['REMOVIDO']},
+        status: { $ne: Status['REMOVIDO'] },
       })
 
-      for( let service of services){
+      for (let service of services) {
         const files = await FilesModel.find({
           model: 'Services',
-          reference_id: service._id
+          reference_id: service._id,
         })
         newServices.push({
-          service: service._doc ,
-          files
+          service: service._doc,
+          files,
         })
       }
 
@@ -39,7 +38,10 @@ class ServicesController {
         services: newServices,
       })
     } catch (error) {
-      res.status(404).send({ message: error.message })
+      res.status(404).send({
+        message: 'Lista de serviços não encontrada',
+        error: error.message,
+      })
     }
   }
 
@@ -59,7 +61,10 @@ class ServicesController {
         services: newServices,
       })
     } catch (error) {
-      res.status(404).send({ message: error.message })
+      res.status(404).send({
+        message: 'Erro ao filtrar lista de serviços',
+        error: error.message,
+      })
     }
   }
 
@@ -94,6 +99,7 @@ class ServicesController {
         if (errors.length > 0) {
           return res.status(404).send(errors[0])
         }
+
         const jsonService = JSON.parse(service)
         const newService = await new ServicesModel(jsonService).save()
 
@@ -114,7 +120,9 @@ class ServicesController {
       })
       req.pipe(busboy)
     } catch (error) {
-      res.status(404).send({ message: error.message })
+      res
+        .status(404)
+        .send({ message: 'Erro ao criar serviço', error: error.message })
     }
   }
 
@@ -174,7 +182,9 @@ class ServicesController {
       })
       req.pipe(busboy)
     } catch (error) {
-      res.status(404).send({ message: error.message })
+      res
+        .status(404)
+        .send({ message: 'Erro ao atualizar serviço', error: error.message })
     }
   }
 
@@ -188,13 +198,13 @@ class ServicesController {
         status: Status[newStatus],
       })
 
-      res
-        .status(200)
-        .send({
-          message: `Status do serviço atualizado com sucesso. Novo status: ${newStatus}`,
-        })
+      res.status(200).send({
+        message: `Status do serviço atualizado com sucesso. Novo status: ${newStatus}`,
+      })
     } catch (error) {
-      res.status(404).send({ message: error.message })
+      res
+        .status(404)
+        .send({ message: 'Erro ao atualizar serviço', error: error.message })
     }
   }
 }

@@ -17,11 +17,30 @@ const CompaniesSchema = new Schema({
   background: String,
   phone_number: String,
   address: {
-    country: String,
-    state: String,
-    city: String,
-    cep: String,
-    number: String,
+    country: {
+      type: String,
+      required: true,
+    },
+    state: {
+      type: String,
+      required: true,
+    },
+    city: {
+      type: String,
+      required: true,
+    },
+    cep: {
+      type: String,
+      required: true,
+    },
+    number: {
+      type: String,
+      required: true,
+    },
+    street: {
+      type: String,
+      required: true,
+    },
   },
   geolocation: {
     type: {
@@ -30,6 +49,54 @@ const CompaniesSchema = new Schema({
     coordinates: {
       type: [Number],
     },
+  },
+  status: {
+    type: String,
+    enum: ['ATIVO', 'INATIVO'],
+    required: true,
+    default: 'ATIVO',
+  },
+  bank_account: {
+    acc_user_name: {
+      type: String,
+      required: true,
+    },
+    acc_number: {
+      type: String,
+      required: true,
+      unique: [true, 'Conta bancária já cadastrada'],
+    },
+    acc_type: {
+      type: String,
+      enum: [
+        'conta_corrente',
+        'conta_poupanca',
+        'conta_corrente_conjunta',
+        'conta_poupanca_conjunta',
+      ],
+      required: true,
+    },
+    bank_code: {
+      type: String,
+      required: true,
+    },
+    bank_agency: {
+      type: String,
+      required: true,
+    },
+    verify_digit: {
+      type: String,
+      required: true,
+    },
+    cpf_or_cnpj: {
+      type: String,
+      required: true,
+      unique: [true, 'CPF/CNPJ já cadastrado'],
+    },
+  },
+  recipient_id: {
+    type: String,
+    required: true
   },
   created_at: {
     type: Date,

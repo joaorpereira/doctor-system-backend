@@ -19,7 +19,7 @@ export type IBankAccount = {
   acc_type: AccountType
   bank_code: String
   verify_digit: String
-  cpf_or_cnpj: String
+  number: String
   acc_number: String
 }
 

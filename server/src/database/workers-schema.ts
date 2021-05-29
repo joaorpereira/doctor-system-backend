@@ -30,6 +30,18 @@ const WorkersSchema = new Schema({
     required: true,
     default: 'ATIVO',
   },
+  document: {
+    type: {
+      type: String,
+      enum: ['cpf', 'cnpj'],
+      required: true,
+    },
+    number: {
+      type: String,
+      required: true,
+      unique: [true, 'CPF/CNPJ já cadastrado'],
+    },
+  },
   bank_account: {
     acc_user_name: {
       type: String,
@@ -61,11 +73,6 @@ const WorkersSchema = new Schema({
     verify_digit: {
       type: String,
       required: true,
-    },
-    cpf_or_cnpj: {
-      type: String,
-      required: true,
-      unique: [true, 'CPF/CNPJ já cadastrado'],
     },
   },
   recipient_id: {

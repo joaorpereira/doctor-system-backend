@@ -83,7 +83,7 @@ class ClientsControllers {
           documents: [
             {
               type: client_data.document.type,
-              number: client_data.document.cpf_or_cnpj,
+              number: client_data.document.number,
             },
           ],
           phone_numbers: [client_data.phone_number],

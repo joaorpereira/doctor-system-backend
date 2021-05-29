@@ -5,7 +5,12 @@ import { CompanyWorkerModel } from '../models/relations/companyWorker/companyWor
 import { WorkerServiceModel } from '../models/relations/workerService/workerService-model'
 import { Status } from '../models/relations/companyWorker/companyWorker-types'
 import { pagarmeService } from '../services/pargar-me'
-import { IWorkers, IBankAccount } from '../models/workers/workers-types'
+import {
+  IWorkers,
+  IBankAccount,
+  IDocument,
+  AccountType,
+} from '../models/workers/workers-types'
 import {
   IWorkerData,
   ICompanyWorkers,
@@ -26,7 +31,7 @@ class WorkersController {
   async getWorker(req: Request, res: Response) {
     try {
       const { id } = req.params
-      console.log(id)
+
       const worker = await WorkersModel.findById(id)
 
       res.status(200).send({ worker })
@@ -59,13 +64,14 @@ class WorkersController {
 
       if (!worker) {
         const bank_account: IBankAccount = worker_data.bank_account
+        const document: IDocument = worker_data.document
 
         const pagarMeBankAccount = await pagarmeService('bank_accounts', {
           agencia: bank_account.bank_agency,
           bank_code: bank_account.bank_code,
           conta: bank_account.acc_number,
           conta_dv: bank_account.verify_digit,
-          document_number: bank_account.cpf_or_cnpj,
+          document_number: document.number,
           legal_name: bank_account.acc_user_name,
           type: bank_account.acc_type,
         })
@@ -84,7 +90,7 @@ class WorkersController {
           throw pagarMeRecipient as string
         }
 
-        // // create worker
+        // create worker
 
         newWorker = await new WorkersModel({
           ...worker_data,
@@ -224,12 +230,10 @@ class WorkersController {
 
       res.status(200).send({ lifOfWorkers })
     } catch (error) {
-      res
-        .status(404)
-        .send({
-          message: 'Lista de colaboradores não encontrada',
-          error: error.message,
-        })
+      res.status(404).send({
+        message: 'Lista de colaboradores não encontrada',
+        error: error.message,
+      })
     }
   }
 }

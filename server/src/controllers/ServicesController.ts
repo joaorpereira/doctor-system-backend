@@ -127,7 +127,7 @@ class ServicesController {
   }
 
   async update(req: Request, res: Response) {
-    const { company_id, service } = req.body
+    const { service } = req.body
     const { id } = req.params
 
     const documentFile = (req as IBusboyRequest).files
@@ -146,7 +146,7 @@ class ServicesController {
             const file = documentFile[key]
             const nameParts: string[] = file.name.split('.')
             const fileName = `${currentTime}.${nameParts[nameParts.length - 1]}`
-            const path = `services/${company_id}/${fileName}`
+            const path = `services/${service?.company_id}/${fileName}`
 
             const response = (await uploadToS3(file, path)) as any
             if (response.error) {

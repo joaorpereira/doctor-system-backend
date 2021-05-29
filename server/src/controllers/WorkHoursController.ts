@@ -1,8 +1,8 @@
 import { Response, Request } from 'express'
-import { WorkerServiceModel } from '../models/relations/workerService/workerService-model'
-import { Status } from '../models/relations/workerService/workerService-types'
-import { WorkHoursModel } from '../models/workHours/workHours-model'
-import { IWorkHoursBody } from '../models/workHours/workHours-types'
+import { WorkerServiceModel } from '../models/relations/workerService/workerServiceModel'
+import { Status } from '../models/relations/workerService/workerServiceTypes'
+import { WorkHoursModel } from '../models/workHours/workHoursModel'
+import { IWorkHoursBody } from '../models/workHours/workHoursTypes'
 import * as _ from 'lodash'
 
 type ListOfWorkers = {

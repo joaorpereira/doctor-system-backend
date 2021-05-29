@@ -5,11 +5,11 @@ import { Request, Response } from 'express'
 dotenv.config()
 
 import { pagarmeService } from '../services/pargar-me'
-import { ClientsModel } from '../models/clients/clients-model'
-import { ServicesModel } from '../models/services/services-model'
-import { CompaniesModel } from '../models/companies/companies-model'
-import { WorkersModel } from '../models/workers/workers-model'
-import { ScheduleModel } from '../models/schedule/schedule-model'
+import { ClientsModel } from '../models/clients/clientsModel'
+import { ServicesModel } from '../models/services/servicesModel'
+import { CompaniesModel } from '../models/companies/companiesModel'
+import { WorkersModel } from '../models/workers/workersModel'
+import { ScheduleModel } from '../models/schedule/scheduleModel'
 
 type CreateParams = {
   company_id: string

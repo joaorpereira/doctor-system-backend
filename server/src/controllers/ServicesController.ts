@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
-import { ServicesModel } from '../models/services/services-model'
-import { Status } from '../models/services/services-types'
-import { FilesModel } from '../models/files/files-model'
+import { ServicesModel } from '../models/services/servicesModel'
+import { Status } from '../models/services/servicesTypes'
+import { FilesModel } from '../models/files/filesModel'
 import Busboy from 'busboy'
 import { uploadToS3 } from '../services/aws'
 

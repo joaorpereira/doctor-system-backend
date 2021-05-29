@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { FilesModel } from '../models/files/files-model'
+import { FilesModel } from '../models/files/filesModel'
 import { deleteFileS3 } from '../services/aws'
 
 class FilesController {

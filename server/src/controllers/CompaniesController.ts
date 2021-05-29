@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
 import { Request, Response } from 'express'
-import { CompaniesModel } from '../models/companies/companies-model'
+import { CompaniesModel } from '../models/companies/companiesModel'
 import { getDistance } from '../services/distance'
 import { pagarmeService } from '../services/pargar-me'
 

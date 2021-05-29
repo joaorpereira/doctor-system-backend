@@ -1,8 +1,0 @@
-import { model } from 'mongoose'
-import companyWorker from '../../../database/relations/companyWorker-schema'
-import { ICompanyWorkerDocument } from './companyWorker-types'
-
-export const CompanyWorkerModel = model<ICompanyWorkerDocument>(
-  'CompanyWorker',
-  companyWorker
-)

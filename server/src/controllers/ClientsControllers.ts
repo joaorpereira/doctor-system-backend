@@ -1,10 +1,10 @@
 import mongoose from 'mongoose'
 import { Request, Response } from 'express'
-
+T
 import { pagarmeService } from '../services/pargar-me'
-import { ClientsModel } from '../models/clients/clients-model'
-import { IClients, Status, DocumentType } from '../models/clients/clients-types'
-import { CompanyClientModel } from '../models/relations/companyClient/companyClient-model'
+import { ClientsModel } from '../models/clients/clientsModel'
+import { IClients, Status, DocumentType } from '../models/clients/clientsTypes'
+import { CompanyClientModel } from '../models/relations/companyClient/companyClientModel'
 
 class ClientsControllers {
   async getAllClients(req: Request, res: Response) {

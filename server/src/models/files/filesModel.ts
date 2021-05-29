@@ -1,5 +1,5 @@
 import { model } from 'mongoose'
-import FilesSchema from '../../database/files-schema'
-import { IFilesDocument } from './files-types'
+import FilesSchema from '../../database/fileSchema'
+import { IFilesDocument } from './filesTypes'
 
 export const FilesModel = model<IFilesDocument>('Files', FilesSchema)

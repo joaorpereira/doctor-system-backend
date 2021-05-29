@@ -1,20 +1,20 @@
 import mongoose from 'mongoose'
 import { Request, Response } from 'express'
-import { WorkersModel } from '../models/workers/workers-model'
-import { CompanyWorkerModel } from '../models/relations/companyWorker/companyWorker-model'
-import { WorkerServiceModel } from '../models/relations/workerService/workerService-model'
-import { Status } from '../models/relations/companyWorker/companyWorker-types'
+import { WorkersModel } from '../models/workers/workersModel'
+import { CompanyWorkerModel } from '../models/relations/companyWorker/companyWorkerModel'
+import { WorkerServiceModel } from '../models/relations/workerService/workerServiceModel'
+import { Status } from '../models/relations/companyWorker/companyWorkerTypes'
 import { pagarmeService } from '../services/pargar-me'
 import {
   IWorkers,
   IBankAccount,
   IDocument,
   AccountType,
-} from '../models/workers/workers-types'
+} from '../models/workers/workersTypes'
 import {
   IWorkerData,
   ICompanyWorkers,
-} from '../models/relations/workerService/workerService-types'
+} from '../models/relations/workerService/workerServiceTypes'
 
 class WorkersController {
   async getAllWorkers(req: Request, res: Response) {

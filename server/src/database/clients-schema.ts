@@ -36,7 +36,7 @@ const ClientsSchema = new Schema({
       enum: ['cpf', 'cnpj'],
       required: true,
     },
-    cpf_or_cnpj: {
+    number: {
       type: String,
       required: true,
       unique: [true, 'CPF/CNPJ já cadastrado'],

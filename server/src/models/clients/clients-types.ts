@@ -16,7 +16,7 @@ export enum DocumentType {
 }
 
 export interface IDocument {
-  cpf_or_cnpj: String
+  number: String
   type: DocumentType
 }
 

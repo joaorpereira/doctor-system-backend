@@ -15,7 +15,7 @@ class FilesController {
 
       res.status(200).send({message: 'Arquivo removido com sucesso'})
     } catch (error) {
-      res.status(404).send({ message: error.message })
+      res.status(404).send({ message: 'Erro ao remover arquivo', error: error.message })
     }
   }
 }

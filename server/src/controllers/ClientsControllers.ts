@@ -14,7 +14,10 @@ class ClientsControllers {
     } catch (error) {
       res
         .status(404)
-        .send({ message: 'Lista de clientes não encontrada', error })
+        .send({
+          message: 'Lista de clientes não encontrada',
+          error: error.message,
+        })
     }
   }
 
@@ -25,7 +28,9 @@ class ClientsControllers {
 
       res.status(200).send({ client })
     } catch (error) {
-      res.status(404).send({ message: 'Cliente não encontrado', error })
+      res
+        .status(404)
+        .send({ message: 'Cliente não encontrado', error: error.message })
     }
   }
 
@@ -36,7 +41,9 @@ class ClientsControllers {
 
       res.status(200).send({ clients, message: 'Lista de clientes encontrada' })
     } catch (error) {
-      res.status(404).send({ message: 'Cliente não encontrado', error })
+      res
+        .status(404)
+        .send({ message: 'Cliente não encontrado', error: error.message })
     }
   }
 
@@ -44,6 +51,7 @@ class ClientsControllers {
     const db = mongoose.connection
     const session = await db.startSession()
     session.startTransaction()
+    let message = 'Erro ao criar cliente'
 
     try {
       const {
@@ -75,7 +83,7 @@ class ClientsControllers {
           documents: [
             {
               type: client_data.document.type,
-              number: client_data.document.cpf_or_cnpj,
+              number: client_data.document.number,
             },
           ],
           phone_numbers: [client_data.phone_number],
@@ -127,7 +135,8 @@ class ClientsControllers {
       session.endSession()
 
       if (client && verifyRelationship) {
-        throw new Error('Cliente já cadastrado')
+        message = 'Cliente já cadastrado'
+        throw new Error(message)
       } else {
         res.status(201).send({
           client: client ?? newClient,
@@ -137,7 +146,7 @@ class ClientsControllers {
     } catch (error) {
       await session.abortTransaction()
       session.endSession()
-      res.status(404).send({ message: 'Erro ao criar cliente', error })
+      res.status(404).send({ message, error })
     }
   }
 
@@ -160,7 +169,10 @@ class ClientsControllers {
 
       res.status(200).send({ client, message: 'Cliente alterado com sucesso' })
     } catch (error) {
-      res.status(404).send({ message: 'Erro ao alterar dados do cliente' })
+      res.status(404).send({
+        message: 'Erro ao alterar dados do cliente',
+        error: error.message,
+      })
     }
   }
 
@@ -170,7 +182,9 @@ class ClientsControllers {
       await ClientsModel.deleteOne({ _id: id })
       res.status(200).send({ message: 'Cliente removido com sucesso' })
     } catch (error) {
-      res.status(404).send({ message: 'Erro ao remover Cliente', error })
+      res
+        .status(404)
+        .send({ message: 'Erro ao remover Cliente', error: error.message })
     }
   }
 }

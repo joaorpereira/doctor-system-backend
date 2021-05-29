@@ -5,7 +5,12 @@ import { CompanyWorkerModel } from '../models/relations/companyWorker/companyWor
 import { WorkerServiceModel } from '../models/relations/workerService/workerService-model'
 import { Status } from '../models/relations/companyWorker/companyWorker-types'
 import { pagarmeService } from '../services/pargar-me'
-import { IWorkers, IBankAccount } from '../models/workers/workers-types'
+import {
+  IWorkers,
+  IBankAccount,
+  IDocument,
+  AccountType,
+} from '../models/workers/workers-types'
 import {
   IWorkerData,
   ICompanyWorkers,
@@ -17,14 +22,16 @@ class WorkersController {
       const workers = await WorkersModel.find()
       res.status(200).send({ workers })
     } catch (error) {
-      res.status(404).send({ message: 'Lista de colaboradores não encontrada', error })
+      res
+        .status(404)
+        .send({ message: 'Lista de colaboradores não encontrada', error })
     }
   }
 
   async getWorker(req: Request, res: Response) {
     try {
       const { id } = req.params
-      console.log(id)
+
       const worker = await WorkersModel.findById(id)
 
       res.status(200).send({ worker })
@@ -37,6 +44,8 @@ class WorkersController {
     const db = mongoose.connection
     const session = await db.startSession()
     session.startTransaction()
+
+    let message = 'Erro ao criar colaborador'
 
     try {
       const {
@@ -55,13 +64,14 @@ class WorkersController {
 
       if (!worker) {
         const bank_account: IBankAccount = worker_data.bank_account
+        const document: IDocument = worker_data.document
 
         const pagarMeBankAccount = await pagarmeService('bank_accounts', {
           agencia: bank_account.bank_agency,
           bank_code: bank_account.bank_code,
           conta: bank_account.acc_number,
           conta_dv: bank_account.verify_digit,
-          document_number: bank_account.cpf_or_cnpj,
+          document_number: document.number,
           legal_name: bank_account.acc_user_name,
           type: bank_account.acc_type,
         })
@@ -80,7 +90,7 @@ class WorkersController {
           throw pagarMeRecipient as string
         }
 
-        // // create worker
+        // create worker
 
         newWorker = await new WorkersModel({
           ...worker_data,
@@ -135,7 +145,8 @@ class WorkersController {
       session.endSession()
 
       if (worker && verifyRelationship) {
-        throw new Error('Colaborador já cadastrado')
+        message = 'Colaborador já cadastrado'
+        throw new Error(message)
       } else {
         res.status(201).send({
           worker: worker ?? newWorker,
@@ -145,7 +156,7 @@ class WorkersController {
     } catch (error) {
       await session.abortTransaction()
       session.endSession()
-      res.status(404).send({ message: 'Erro ao criar colaborador', error })
+      res.status(404).send({ message, error: error.message })
     }
   }
 
@@ -168,7 +179,9 @@ class WorkersController {
         .status(200)
         .send({ company, message: 'Colaborador alterado com sucesso' })
     } catch (error) {
-      res.status(404).send({ message: 'Erro ao alterar colaborador' })
+      res
+        .status(404)
+        .send({ message: 'Erro ao alterar colaborador', error: error.message })
     }
   }
 
@@ -178,7 +191,9 @@ class WorkersController {
       await WorkersModel.deleteOne({ _id: id })
       res.status(200).send({ message: 'Colaborador removido com sucesso' })
     } catch (error) {
-      res.status(404).send({ message: 'Erro ao remover colaborador', error })
+      res
+        .status(404)
+        .send({ message: 'Erro ao remover colaborador', error: error.message })
     }
   }
 
@@ -215,7 +230,10 @@ class WorkersController {
 
       res.status(200).send({ lifOfWorkers })
     } catch (error) {
-      res.status(404).send({ message: "Lista de colaboradores não encontrada", error })
+      res.status(404).send({
+        message: 'Lista de colaboradores não encontrada',
+        error: error.message,
+      })
     }
   }
 }

@@ -17,6 +17,10 @@ export enum AccountType {
   conta_poupanca_conjunta = 'conta_poupanca_conjunta',
   conta_corrente_conjunta = 'conta_corrente_conjunta',
 }
+export interface IDocument {
+  number: String
+  type: DocumentType
+}
 
 export type IBankAccount = {
   acc_user_name: String
@@ -24,7 +28,6 @@ export type IBankAccount = {
   acc_type: AccountType
   bank_code: String
   verify_digit: String
-  cpf_or_cnpj: String
   acc_number: String
 }
 
@@ -38,13 +41,13 @@ export interface IWorkers {
   gender: Gender
   birth_date: String
   status: Status
+  document: IDocument
   bank_account: IBankAccount
   recipient_id?: String
   created_at?: Date
   updated_at?: Date
 }
 
-export interface IWorkersDocument extends IWorkers, Document {
-}
+export interface IWorkersDocument extends IWorkers, Document {}
 
 export interface IWorkersModel extends Model<IWorkersDocument> {}

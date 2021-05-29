@@ -83,9 +83,9 @@ class ScheduleController {
 
       const finalPrice = Number(service?.price)
 
-      const workerPrice = finalPrice * 0.65
-      const companyPrice = finalPrice * 0.25
-      const appPrice = finalPrice * 0.1
+      const workerPrice = finalPrice * 65 
+      const companyPrice = finalPrice * 25
+      const appPrice = finalPrice * 1
 
       const zipCode =
         client && (client.address.cep.split('-').join('') as string)

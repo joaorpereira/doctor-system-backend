@@ -1,5 +1,12 @@
 import mongoose from 'mongoose'
 import dotenv from 'dotenv'
+import {
+  eachMinuteOfInterval,
+  endOfDay,
+  getDaysInMonth,
+  startOfDay,
+  add,
+} from 'date-fns'
 import { Request, Response } from 'express'
 
 dotenv.config()
@@ -10,6 +17,7 @@ import { ServicesModel } from '../models/services/servicesModel'
 import { CompaniesModel } from '../models/companies/companiesModel'
 import { WorkersModel } from '../models/workers/workersModel'
 import { ScheduleModel } from '../models/schedule/scheduleModel'
+import { WorkHoursModel } from '../models/workHours/workHoursModel'
 
 type CreateParams = {
   company_id: string
@@ -28,11 +36,61 @@ type IFilter = {
 }
 
 class ScheduleController {
-  async getScheduleList(req: Request, res: Response) {}
+  async getScheduleDisponibility(req: Request, res: Response) {
+    try {
+      const { company_id, service_id, date } = req.body
+
+      const service = await ServicesModel.findById(service_id).select(
+        'service_duration'
+      )
+
+      const workHours = await WorkHoursModel.find({ company_id })
+
+      const currentDay = new Date()
+
+      const daysInCurrentMonth = getDaysInMonth(currentDay)
+
+      let monthSchedule: any = []
+
+      const dayHourSchedule = eachMinuteOfInterval(
+        {
+          start: startOfDay(currentDay),
+          end: endOfDay(currentDay),
+        },
+        { step: 30 }
+      )
+        .slice(12, -3)
+        .map(day => ({
+          hour: `${day.getHours()}:${
+            day.getMinutes() !== 0 ? day.getMinutes() : '00'
+          }`,
+          available: true,
+          workers: [],
+          services: [],
+        }))
+
+      for (let i = 0; i <= daysInCurrentMonth; i++) {
+        const day = add(currentDay, {
+          days: i,
+        })
+        const object = {
+          day: day,
+          schedule: dayHourSchedule,
+        }
+        monthSchedule.push(object)
+      }
+
+      res.status(200).send({ monthSchedule })
+    } catch (error) {
+      res
+        .status(404)
+        .send({ message: 'Erro ao criar horário', error: error.message })
+    }
+  }
 
   async filterScheduleList(req: Request, res: Response) {
     try {
-      const { range, company_id } : IFilter = req.body
+      const { range, company_id }: IFilter = req.body
 
       const schedules = await ScheduleModel.find({
         company_id: company_id,
@@ -47,7 +105,9 @@ class ScheduleController {
       ])
       res.status(200).send({ schedules })
     } catch (error) {
-      res.status(404).send({ message: 'Erro ao filtrar horário', error: error.message })
+      res
+        .status(404)
+        .send({ message: 'Erro ao filtrar horário', error: error.message })
     }
   }
 
@@ -83,7 +143,7 @@ class ScheduleController {
 
       const finalPrice = Number(service?.price)
 
-      const workerPrice = finalPrice * 65 
+      const workerPrice = finalPrice * 65
       const companyPrice = finalPrice * 25
       const appPrice = finalPrice * 1
 

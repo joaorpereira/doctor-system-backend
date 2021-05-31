@@ -30,10 +30,17 @@ const WorkersSchema = new Schema({
     required: true,
     default: 'ATIVO',
   },
-  cpf_or_cnpj: {
-    type: String,
-    required: true,
-    unique: [true, 'CPF/CNPJ já cadastrado'],
+  document: {
+    type: {
+      type: String,
+      enum: ['cpf', 'cnpj'],
+      required: true,
+    },
+    number: {
+      type: String,
+      required: true,
+      unique: [true, 'CPF/CNPJ já cadastrado'],
+    },
   },
   bank_account: {
     acc_user_name: {
@@ -47,10 +54,15 @@ const WorkersSchema = new Schema({
     },
     acc_type: {
       type: String,
-      enum: ['CORRENTE, SALARIO, POUPANCA'],
+      enum: [
+        'conta_corrente',
+        'conta_poupanca',
+        'conta_corrente_conjunta',
+        'conta_poupanca_conjunta',
+      ],
       required: true,
     },
-    bank_name: {
+    bank_code: {
       type: String,
       required: true,
     },
@@ -63,7 +75,7 @@ const WorkersSchema = new Schema({
       required: true,
     },
   },
-  recipient_id : {
+  recipient_id: {
     type: String,
     required: true,
   },

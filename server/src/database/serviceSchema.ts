@@ -15,7 +15,7 @@ const ServicesSchema = new Schema({
     required: true,
   },
   service_duration: {
-    type: Number, //minutes
+    type: Date, //minutes
     required: true,
   },
   service_recurrence: {

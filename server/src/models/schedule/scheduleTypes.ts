@@ -4,6 +4,7 @@ export interface ISchedule {
   company_id: string
   client_id: string
   worker_id: string
+  service_id: string
   schedule_date: Date
   price: Number
   transaction_id: String

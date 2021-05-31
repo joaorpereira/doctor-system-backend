@@ -10,14 +10,24 @@ export enum Status {
   INATIVO = 'INATIVO',
 }
 
+export enum DocumentType {
+  cpf = 'cpf',
+  cnpj = 'cnpj',
+}
+
+export interface IDocument {
+  number: String
+  type: DocumentType
+}
+
 export type IAddress = {
   country: String
   state: String
   city: String
   cep: String
   number: String
+  street: String
 }
-
 export interface IClients {
   name: string
   email: string
@@ -27,10 +37,11 @@ export interface IClients {
   gender: Gender
   birth_date: String
   status: Status
-  cpf_or_cnpj: String
+  document: IDocument
   address: IAddress
-  created_at: Date
-  updated_at: Date
+  customer_id?: string
+  created_at?: Date
+  updated_at?: Date
 }
 
 export interface IClientsDocument extends IClients, Document {}

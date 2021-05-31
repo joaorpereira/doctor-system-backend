@@ -8,36 +8,44 @@ export enum Gender {
 export enum Status {
   ATIVO = 'ATIVO',
   INATIVO = 'INATIVO',
+  REMOVIDO = 'REMOVIDO',
 }
 
 export enum AccountType {
-  CORRENTE = 'CORRENTE',
-  SALARIO = 'SALARIO',
-  POUPANCA = 'POUPANCA',
+  conta_corrente = 'conta_corrente',
+  conta_poupanca = 'conta_poupanca',
+  conta_poupanca_conjunta = 'conta_poupanca_conjunta',
+  conta_corrente_conjunta = 'conta_corrente_conjunta',
+}
+export interface IDocument {
+  number: String
+  type: DocumentType
 }
 
 export type IBankAccount = {
   acc_user_name: String
-  acc_type: String
-  city: AccountType
-  bank_name: String
+  bank_agency: String
+  acc_type: AccountType
+  bank_code: String
   verify_digit: String
+  acc_number: String
 }
 
 export interface IWorkers {
+  services?: string[]
   name: string
   email: string
   password: string
-  picture: string
+  picture?: string
   phone_number: string
   gender: Gender
   birth_date: String
   status: Status
-  cpf_or_cnpj: String
+  document: IDocument
   bank_account: IBankAccount
-  recipient_id: String
-  created_at: Date
-  updated_at: Date
+  recipient_id?: String
+  created_at?: Date
+  updated_at?: Date
 }
 
 export interface IWorkersDocument extends IWorkers, Document {}

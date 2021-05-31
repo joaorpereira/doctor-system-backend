@@ -9,7 +9,7 @@ export interface IServices {
   company_id: string
   title: string
   price: Number
-  service_duration: Number
+  service_duration: Date
   service_recurrence: Number
   description: String
   status: Status

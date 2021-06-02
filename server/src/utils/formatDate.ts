@@ -29,3 +29,15 @@ export const getIntervalByMinutes = (
     { step: 30 }
   )
 }
+
+export const splitByValue = (array : string[], value: string) => {
+  let newArray: any = [[]]
+  array.forEach((element: string) => {
+    if (element !== value) {
+      newArray[newArray.length - 1].push(element)
+    } else {
+      newArray.push([])
+    }
+  })
+  return newArray
+}

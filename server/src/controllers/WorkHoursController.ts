@@ -69,11 +69,11 @@ class WorkHoursController {
 
       const update = {
         ...data,
-        services: data.services && data.services,
-        workers: data.workers && data.workers,
-        days: data.days && data.days,
-        start_time: data.start_time && data.start_time,
-        end_time: data.end_time && data.end_time,
+        services: data.services,
+        workers: data.workers,
+        days: data.days,
+        start_time: data.start_time,
+        end_time: data.end_time,
       }
 
       const work_hours = await WorkHoursModel.findOneAndUpdate(

@@ -52,5 +52,6 @@ router.delete('/client/:id', ClientsControllers.delete)
 // === schedule ===
 router.post('/schedule', ScheduleController.create)
 router.post('/schedule/filter', ScheduleController.filterScheduleList)
+router.post('/schedule/disponibility', ScheduleController.getScheduleDisponibility)
 
 export default router

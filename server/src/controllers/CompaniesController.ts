@@ -21,9 +21,9 @@ class CompaniesController {
     try {
       const { id, lat: user_lat, lon: user_lon } = req.params;
 
-      let company = await CompaniesModel.findById(id);
+      const company = await CompaniesModel.findById(id);
       let distance = 0;
-      
+
       if (company) {
         const company_coord: number[] = Object.values(
           company.geolocation.coordinates
@@ -66,30 +66,42 @@ class CompaniesController {
         throw new Error(message);
       }
 
-      const bank_account = companyData.bank_account;
+      const { bank_account } = companyData;
 
-      const pagarMeBankAccount = await pagarmeService("bank_accounts", {
+      const bankAccountData = {
         agencia: bank_account.bank_agency,
         bank_code: bank_account.bank_code,
         conta: bank_account.acc_number,
         conta_dv: bank_account.verify_digit,
-        // document_number: bank_account.cpf_or_cnpj,
+        document_number: bank_account.cpf_or_cnpj,
         legal_name: bank_account.acc_user_name,
         type: bank_account.acc_type,
+      };
+
+      const pagarMeBankAccount = await pagarmeService({
+        endpoint: "bank_accounts",
+        data: bankAccountData,
       });
 
       if (pagarMeBankAccount.message) {
+        // eslint-disable-next-line no-throw-literal
         throw pagarMeBankAccount as string;
       }
 
-      const pagarMeRecipient = await pagarmeService("recipients", {
+      const recipientData = {
         transfer_interval: "daily",
         transfer_enabled: true,
         bank_account_id: pagarMeBankAccount?.data?.id,
+      };
+
+      const pagarMeRecipient = await pagarmeService({
+        endpoint: "recipients",
+        data: recipientData,
       });
 
       if (pagarMeRecipient.message) {
         message = pagarMeRecipient as string;
+        // eslint-disable-next-line no-throw-literal
         throw pagarMeRecipient as string;
       }
 

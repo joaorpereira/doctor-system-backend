@@ -14,13 +14,13 @@ export enum AccountType {
 }
 
 export type IBankAccount = {
-  acc_user_name: String;
-  bank_agency: String;
+  acc_user_name: string;
+  bank_agency: string;
   acc_type: AccountType;
-  bank_code: String;
-  verify_digit: String;
-  number: String;
-  acc_number: String;
+  bank_code: string;
+  verify_digit: string;
+  number: string;
+  acc_number: string;
 };
 
 export type IWorkerData = {
@@ -56,4 +56,4 @@ export type ICompanyWorkers = {
 
 export interface IWorkerServiceDocument extends IWorkerService, Document {}
 
-export interface IWorkerServiceModel extends Model<IWorkerServiceDocument> {}
+export type IWorkerServiceModel = Model<IWorkerServiceDocument>;

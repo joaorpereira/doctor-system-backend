@@ -23,17 +23,17 @@ export enum DocumentType {
   cnpj = "cnpj",
 }
 export type IDocument = {
-  number: String;
+  number: string;
   type: DocumentType;
 };
 
 export type IBankAccount = {
-  acc_user_name: String;
-  bank_agency: String;
+  acc_user_name: string;
+  bank_agency: string;
   acc_type: AccountType;
-  bank_code: String;
-  verify_digit: String;
-  acc_number: String;
+  bank_code: string;
+  verify_digit: string;
+  acc_number: string;
 };
 
 export type IWorkers = {
@@ -44,15 +44,15 @@ export type IWorkers = {
   picture?: string;
   phone_number: string;
   gender: Gender;
-  birth_date: String;
+  birth_date: string;
   status: Status;
   document: IDocument;
   bank_account: IBankAccount;
-  recipient_id?: String;
+  recipient_id?: string;
   created_at?: Date;
   updated_at?: Date;
 };
 
 export interface IWorkersDocument extends IWorkers, Document {}
 
-export interface IWorkersModel extends Model<IWorkersDocument> {}
+export type IWorkersModel = Model<IWorkersDocument>;

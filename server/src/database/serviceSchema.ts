@@ -1,10 +1,10 @@
-import mongoose, { Schema } from 'mongoose'
+import mongoose, { Schema } from "mongoose";
 
 const ServicesSchema = new Schema({
   company_id: {
     type: mongoose.Types.ObjectId,
-    ref: 'Companies',
-    required: true
+    ref: "Companies",
+    required: true,
   },
   title: {
     type: String,
@@ -15,11 +15,11 @@ const ServicesSchema = new Schema({
     required: true,
   },
   service_duration: {
-    type: Date, //minutes
+    type: Date, // minutes
     required: true,
   },
   service_recurrence: {
-    type: Number, //days
+    type: Number, // days
     required: true,
   },
   description: {
@@ -28,9 +28,9 @@ const ServicesSchema = new Schema({
   },
   status: {
     type: String,
-    enum: ['ATIVO', 'INATIVO', 'REMOVIDO'],
+    enum: ["ATIVO", "INATIVO", "REMOVIDO"],
     required: true,
-    default: 'ATIVO',
+    default: "ATIVO",
   },
   created_at: {
     type: Date,
@@ -40,6 +40,6 @@ const ServicesSchema = new Schema({
     type: Date,
     default: new Date(),
   },
-})
+});
 
-export default ServicesSchema
+export default ServicesSchema;

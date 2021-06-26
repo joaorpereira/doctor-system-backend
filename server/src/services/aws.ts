@@ -1,59 +1,64 @@
-import dotenv from 'dotenv'
-import AWS from 'aws-sdk'
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+/* eslint-disable no-console */
+import dotenv from "dotenv";
+import AWS from "aws-sdk";
 
-dotenv.config()
+dotenv.config();
 
-export interface IParams {
-  Bucket: string
-  Key: string
-  Body: Object
-  ACL: string
-}
+type IBucketParams = {
+  Bucket: string;
+  Key: string;
+  Body: Record<string, unknown>;
+  ACL: string;
+};
 
-export interface IPromise {
-  file?: string
-  error?: string
-}
+type IAWSPromise = {
+  file?: string;
+  error?: string;
+};
 
-const accessKeyId = process.env.IAM_USER_KEY as string
-const secretAccessKey = process.env.IAM_USER_SECRET as string
-const bucketName = process.env.BUCKET_NAME as string
+type IAWSParams = {
+  file: any;
+  path: string;
+  acl?: string;
+};
 
-export const uploadToS3 = (
-  file: any,
-  filename: string,
-  acl = 'public-read'
-) => {
-  return new Promise<IPromise>((resolve, reject) => {
-    let s3bucket = new AWS.S3({
+const accessKeyId = process.env.IAM_USER_KEY as string;
+const secretAccessKey = process.env.IAM_USER_SECRET as string;
+const bucketName = process.env.BUCKET_NAME as string;
+
+export const uploadToS3 = ({ file, path, acl = "public-read" }: IAWSParams) => {
+  return new Promise<IAWSPromise>((resolve, reject) => {
+    const s3bucket = new AWS.S3({
       accessKeyId,
       secretAccessKey,
       params: { Bucket: bucketName },
-    } as Object)
+    });
 
     s3bucket.createBucket(() => {
-      const params: IParams = {
+      const params: IBucketParams = {
         Bucket: bucketName,
-        Key: filename,
+        Key: path,
         Body: file.data,
         ACL: acl,
-      }
+      };
 
       s3bucket.upload(params, (err: any, data: any) => {
-        if (err) return resolve({ error: err })
-        return resolve({ file: data })
-      })
-    })
-  })
-}
+        if (err) return resolve({ error: err });
+        return resolve({ file: data });
+      });
+    });
+  });
+};
 
 export const deleteFileS3 = (key: string) => {
   return new Promise((resolve, reject) => {
-    let s3bucket = new AWS.S3({
+    const s3bucket = new AWS.S3({
       accessKeyId,
       secretAccessKey,
       params: { Bucket: bucketName },
-    } as Object)
+      // eslint-disable-next-line @typescript-eslint/ban-types
+    } as Object);
 
     s3bucket.createBucket(() => {
       s3bucket.deleteObject(
@@ -61,15 +66,15 @@ export const deleteFileS3 = (key: string) => {
           Bucket: bucketName,
           Key: key,
         },
-        function (err, data) {
+        (err, data) => {
           if (err) {
-            console.log(err)
-            return resolve({ error: err})
+            console.log(err);
+            return resolve({ error: err });
           }
-          console.log(data)
-          return resolve({ file: data })
+          console.log(data);
+          return resolve({ file: data });
         }
-      )
-    })
-  })
-}
+      );
+    });
+  });
+};

@@ -16,17 +16,17 @@ export enum DocumentType {
 }
 
 export type IDocument = {
-  number: String;
+  number: string;
   type: DocumentType;
 };
 
 export type IAddress = {
-  country: String;
-  state: String;
-  city: String;
-  cep: String;
-  number: String;
-  street: String;
+  country: string;
+  state: string;
+  city: string;
+  cep: string;
+  number: string;
+  street: string;
 };
 export type IClients = {
   name: string;
@@ -35,7 +35,7 @@ export type IClients = {
   picture: string;
   phone_number: string;
   gender: Gender;
-  birth_date: String;
+  birth_date: string;
   status: Status;
   document: IDocument;
   address: IAddress;
@@ -46,4 +46,4 @@ export type IClients = {
 
 export interface IClientsDocument extends IClients, Document {}
 
-export interface IClientsModel extends Model<IClientsDocument> {}
+export type IClientsModel = Model<IClientsDocument>;

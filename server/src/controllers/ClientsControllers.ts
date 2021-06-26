@@ -70,11 +70,11 @@ class ClientsControllers {
       if (!client) {
         const _id = mongoose.Types.ObjectId();
 
-        const pagarMeCustomer = await pagarmeService("customers", {
+        const data = {
           external_id: _id,
           name: client_data.name,
           type:
-            client_data.document.type === DocumentType["cpf"]
+            client_data.document.type === DocumentType.cpf
               ? "individual"
               : "corporations",
           country: client_data.address.country,
@@ -87,16 +87,22 @@ class ClientsControllers {
           ],
           phone_numbers: [client_data.phone_number],
           birthday: client_data.birth_date,
+        };
+
+        const pagarMeCustomer = await pagarmeService({
+          endpoint: "customers",
+          data,
         });
 
         if (pagarMeCustomer.message) {
+          // eslint-disable-next-line no-throw-literal
           throw pagarMeCustomer as string;
         }
 
         // create client
         newClient = await new ClientsModel({
           ...client_data,
-          _id: _id,
+          _id,
           customer_id: pagarMeCustomer?.data?.id as string,
         }).save({ session });
       }
@@ -109,7 +115,7 @@ class ClientsControllers {
         company_id,
         client_id,
         status: {
-          $ne: Status["INATIVO"],
+          $ne: Status.INATIVO,
         },
       });
 
@@ -126,7 +132,7 @@ class ClientsControllers {
             company_id,
             client_id,
           },
-          { status: Status["ATIVO"] },
+          { status: Status.ATIVO },
           { session }
         );
       }

@@ -12,9 +12,9 @@ export type ICompanyWorker = {
   status: Status;
   created_at: Date;
   updated_at: Date;
-  _doc?: Object;
+  _doc?: Record<string, unknown>;
 };
 
 export interface ICompanyWorkerDocument extends ICompanyWorker, Document {}
 
-export interface ICompanyWorkerModel extends Model<ICompanyWorkerDocument> {}
+export type ICompanyWorkerModel = Model<ICompanyWorkerDocument>;

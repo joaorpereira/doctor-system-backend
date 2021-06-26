@@ -1,45 +1,45 @@
-import { Schema } from 'mongoose'
+import { Schema } from "mongoose";
 
 const WorkersSchema = new Schema({
   name: {
     type: String,
-    required: [true, 'Nome é obrigatório'],
+    required: [true, "Nome é obrigatório"],
   },
   email: {
     type: String,
-    required: [true, 'Email é obrigatório'],
+    required: [true, "Email é obrigatório"],
   },
   password: {
     type: String,
-    required: [true, 'Senha é obrigatório'],
+    required: [true, "Senha é obrigatório"],
   },
   picture: String,
   phone_number: String,
   gender: {
     type: String,
-    enum: ['MASCULINO', 'FEMININO'],
+    enum: ["MASCULINO", "FEMININO"],
     required: true,
   },
   birth_date: {
     type: String,
-    required: [true, 'Data de nascimento é obrigatório'],
+    required: [true, "Data de nascimento é obrigatório"],
   },
   status: {
     type: String,
-    enum: ['ATIVO', 'INATIVO'],
+    enum: ["ATIVO", "INATIVO"],
     required: true,
-    default: 'ATIVO',
+    default: "ATIVO",
   },
   document: {
     type: {
       type: String,
-      enum: ['cpf', 'cnpj'],
+      enum: ["cpf", "cnpj"],
       required: true,
     },
     number: {
       type: String,
       required: true,
-      unique: [true, 'CPF/CNPJ já cadastrado'],
+      unique: [true, "CPF/CNPJ já cadastrado"],
     },
   },
   bank_account: {
@@ -50,15 +50,15 @@ const WorkersSchema = new Schema({
     acc_number: {
       type: String,
       required: true,
-      unique: [true, 'Conta bancária já cadastrada'],
+      unique: [true, "Conta bancária já cadastrada"],
     },
     acc_type: {
       type: String,
       enum: [
-        'conta_corrente',
-        'conta_poupanca',
-        'conta_corrente_conjunta',
-        'conta_poupanca_conjunta',
+        "conta_corrente",
+        "conta_poupanca",
+        "conta_corrente_conjunta",
+        "conta_poupanca_conjunta",
       ],
       required: true,
     },
@@ -87,6 +87,6 @@ const WorkersSchema = new Schema({
     type: Date,
     default: new Date(),
   },
-})
+});
 
-export default WorkersSchema
+export default WorkersSchema;

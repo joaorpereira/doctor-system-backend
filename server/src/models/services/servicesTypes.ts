@@ -8,10 +8,10 @@ export enum Status {
 export type IServices = {
   company_id: string;
   title: string;
-  price: Number;
+  price: number;
   service_duration: Date;
-  service_recurrence: Number;
-  description: String;
+  service_recurrence: number;
+  description: string;
   status: Status;
   created_at: Date;
   updated_at: Date;
@@ -21,4 +21,4 @@ export interface IServicesDocument extends IServices, Document {
   _doc: IServices;
 }
 
-export interface IServicesModel extends Model<IServicesDocument> {}
+export type IServicesModel = Model<IServicesDocument>;

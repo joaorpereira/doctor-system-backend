@@ -1,22 +1,22 @@
-import mongoose, { Schema } from 'mongoose'
+import mongoose, { Schema } from "mongoose";
 
 const WorkHoursSchema = new Schema({
   company_id: {
     type: mongoose.Types.ObjectId,
-    ref: 'Companies',
+    ref: "Companies",
     required: true,
   },
   services: [
     {
       type: mongoose.Types.ObjectId,
-      ref: 'Services',
+      ref: "Services",
       required: true,
     },
   ],
   workers: [
     {
       type: mongoose.Types.ObjectId,
-      ref: 'Workers',
+      ref: "Workers",
       required: true,
     },
   ],
@@ -40,6 +40,6 @@ const WorkHoursSchema = new Schema({
     type: Date,
     default: new Date(),
   },
-})
+});
 
-export default WorkHoursSchema
+export default WorkHoursSchema;

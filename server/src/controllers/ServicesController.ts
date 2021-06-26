@@ -1,8 +1,9 @@
+/* eslint-disable no-await-in-loop */
 import { Request, Response } from "express";
+import Busboy from "busboy";
 import { ServicesModel } from "../models/services/servicesModel";
 import { Status } from "../models/services/servicesTypes";
 import { FilesModel } from "../models/files/filesModel";
-import Busboy from "busboy";
 import { uploadToS3 } from "../services/aws";
 
 interface IBusboyRequest extends Request {
@@ -15,15 +16,16 @@ interface IErrorAWS {
 class ServicesController {
   async getServicesList(req: Request, res: Response) {
     try {
-      let newServices = [];
+      const newServices = [];
       const { id } = req.params;
 
       const services = await ServicesModel.find({
         company_id: id,
-        status: { $ne: Status["REMOVIDO"] },
+        status: { $ne: Status.REMOVIDO },
       });
 
-      for (let service of services) {
+      // eslint-disable-next-line no-restricted-syntax
+      for (const service of services) {
         const files = await FilesModel.find({
           model: "Services",
           reference_id: service._id,
@@ -48,14 +50,17 @@ class ServicesController {
   async getFilteredServicesList(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const status: Status = Status["ATIVO"];
+      const status: Status = Status.ATIVO;
 
       const services = await ServicesModel.find({
         company_id: id,
         status,
       }).select("_id title");
 
-      const newServices = services.map(s => ({ label: s.title, value: s._id }));
+      const newServices = services.map((s) => ({
+        label: s.title,
+        value: s._id,
+      }));
 
       res.status(200).send({
         services: newServices,
@@ -80,16 +85,18 @@ class ServicesController {
       throw new Error("Dados do serviço enviados de forma incorreta");
     }
 
-    let errors: IErrorAWS[] = [];
-    let files: string[] = [];
-    let busboy = new Busboy({ headers: req.headers });
+    const errors: IErrorAWS[] = [];
+    const files: string[] = [];
+    const busboy = new Busboy({ headers: req.headers });
 
     try {
+      // eslint-disable-next-line consistent-return
       busboy.on("finish", async () => {
         const objectKeysLength = Object.keys(documentFile).length as number;
 
         if (documentFile && objectKeysLength > 0) {
-          for (let key of Object.keys(documentFile)) {
+          // eslint-disable-next-line no-restricted-syntax
+          for (const key of Object.keys(documentFile)) {
             const prefix = Math.floor(Math.random() * 65536);
             const file = documentFile[key];
 
@@ -101,7 +108,10 @@ class ServicesController {
 
             const path = `services/${jsonService.company_id}/${fileName}`;
 
-            const response = (await uploadToS3(file, path)) as any;
+            const response = (await uploadToS3({
+              file,
+              path,
+            })) as any;
 
             if (response.error) {
               errors.push({ error: response.error });
@@ -115,7 +125,7 @@ class ServicesController {
 
         const newService = await new ServicesModel(jsonService).save();
 
-        const newFiles = files.map(file => ({
+        const newFiles = files.map((file) => ({
           reference_id: newService._id as string,
           model: "Services",
           folder: file,
@@ -153,16 +163,18 @@ class ServicesController {
       throw new Error("Dados do serviço enviados de forma incorreta");
     }
 
-    let errors: IErrorAWS[] = [];
-    let files: string[] = [];
-    let busboy = new Busboy({ headers: req.headers });
+    const errors: IErrorAWS[] = [];
+    const files: string[] = [];
+    const busboy = new Busboy({ headers: req.headers });
 
     try {
+      // eslint-disable-next-line consistent-return
       busboy.on("finish", async () => {
         const objectKeysLength = Object.keys(documentFile).length as number;
 
         if (documentFile && objectKeysLength > 0) {
-          for (let key of Object.keys(documentFile)) {
+          // eslint-disable-next-line no-restricted-syntax
+          for (const key of Object.keys(documentFile)) {
             const prefix = Math.floor(Math.random() * 65536);
 
             const file = documentFile[key];
@@ -196,7 +208,11 @@ class ServicesController {
           jsonService
         );
 
-        const newFiles = files.map(file => ({
+        if (!newService) {
+          throw new Error("Serviço não encontrado");
+        }
+
+        const newFiles = files.map((file) => ({
           reference_id: id,
           model: "Services",
           folder: file,

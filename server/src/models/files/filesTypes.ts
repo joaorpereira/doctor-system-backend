@@ -1,5 +1,5 @@
 import { Document, Model } from "mongoose";
 
-export interface IFilesDocument extends Document {}
+export type IFilesDocument = Document;
 
-export interface IFilesModel extends Model<IFilesDocument> {}
+export type IFilesModel = Model<IFilesDocument>;

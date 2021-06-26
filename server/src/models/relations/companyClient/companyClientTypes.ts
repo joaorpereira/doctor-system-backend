@@ -16,4 +16,4 @@ export type ICompanyClient = {
 
 export interface ICompanyClientDocument extends ICompanyClient, Document {}
 
-export interface ICompanyClientModel extends Model<ICompanyClientDocument> {}
+export type ICompanyClientModel = Model<ICompanyClientDocument>;

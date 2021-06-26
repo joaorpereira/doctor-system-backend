@@ -1,15 +1,15 @@
-import mongoose, { Schema } from 'mongoose'
+import mongoose, { Schema } from "mongoose";
 
 const FilesSchema = new Schema({
-  //referencia dinamica
+  // referencia dinamica
   reference_id: {
     type: mongoose.Types.ObjectId,
-    refPath: 'model',
+    refPath: "model",
   },
   model: {
     type: String,
     required: true,
-    enum: ['Services', 'Companies'],
+    enum: ["Services", "Companies"],
   },
   folder: {
     type: String,
@@ -23,6 +23,6 @@ const FilesSchema = new Schema({
     type: Date,
     default: new Date(),
   },
-})
+});
 
-export default FilesSchema
+export default FilesSchema;

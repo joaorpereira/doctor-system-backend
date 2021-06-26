@@ -1,10 +1,11 @@
-import mongoose from "mongoose";
+/* eslint-disable no-await-in-loop */
+/* eslint-disable no-restricted-syntax */
+import mongoose, { ObjectId } from "mongoose";
 import dotenv from "dotenv";
 import { Request, Response } from "express";
+
 import { getDay, add, format, startOfDay, endOfDay, subHours } from "date-fns";
 import * as _ from "lodash";
-
-dotenv.config();
 
 import { pagarmeService } from "../services/pargar-me";
 import { ClientsModel } from "../models/clients/clientsModel";
@@ -21,6 +22,8 @@ import {
   splitByValue,
 } from "../utils/formatDate";
 
+dotenv.config();
+
 type CreateParams = {
   company_id: string;
   worker_id: string;
@@ -35,6 +38,11 @@ type IFilter = {
     end: Date;
   };
   company_id: string;
+};
+
+type ISlot = {
+  days: number[];
+  services: string[];
 };
 
 class ScheduleController {
@@ -59,7 +67,7 @@ class ScheduleController {
 
       // service slots
       const slots = serviceMinutes / DURATION_TIME;
-      let servicesSlots = [];
+      const servicesSlots = [];
 
       for (let i = 0; i < slots; i++) {
         const num = serviceMinutes + DURATION_TIME * i;
@@ -68,11 +76,12 @@ class ScheduleController {
       }
 
       // searching next days with available schedule disponibility
-      let schedule = [];
+      const schedule = [];
       let lastDay = new Date(date);
 
       for (let i = 0; i <= 365 && schedule.length < 7; i++) {
-        const validSlots = workHours.filter(({ days, services }) => {
+        // eslint-disable-next-line no-loop-func
+        const validSlots = workHours.filter(({ days, services }: ISlot) => {
           // verifying week day is available
           const day = getDay(lastDay);
           const availableDay = days.includes(day);
@@ -99,21 +108,21 @@ class ScheduleController {
 
         if (validSlots.length > 0) {
           let workerDisponibilityByDay: any = {};
-          for (let slot of validSlots) {
-            for (let workerId of slot.workers) {
+          for (const slot of validSlots) {
+            for (const workerId of slot.workers) {
               const interval = getIntervalByMinutes(
                 slot.start_time,
                 slot.end_time
               );
 
-              workerDisponibilityByDay[workerId] = interval.map(intervalDate =>
-                format(intervalDate, "HH:mm")
+              workerDisponibilityByDay[workerId] = interval.map(
+                (intervalDate) => format(intervalDate, "HH:mm")
               );
             }
           }
 
           // verifying workers disponibility by day
-          for (let workerId of Object.keys(workerDisponibilityByDay)) {
+          for (const workerId of Object.keys(workerDisponibilityByDay)) {
             const start = subHours(startOfDay(lastDay), 3);
             const end = subHours(endOfDay(lastDay), 3);
 
@@ -128,9 +137,9 @@ class ScheduleController {
               .populate("service_id", "service_duration");
 
             // recover scheduled time
-            let busySchedule = unfilteredSchedule
-              .map(schedule => {
-                const duration: any = schedule.service_id as Object;
+            const busySchedule = unfilteredSchedule
+              .map((schedule) => {
+                const duration: any = schedule.service_id as ObjectId;
                 const totalMinutes = convertHourToMinutes(
                   duration.service_duration
                 );
@@ -139,7 +148,7 @@ class ScheduleController {
                   scheduleDate,
                   scheduleDate,
                   totalMinutes
-                ).map(item => format(add(item, { hours: 3 }), "HH:mm"));
+                ).map((item) => format(add(item, { hours: 3 }), "HH:mm"));
                 return interval;
               })
               .flat();
@@ -221,7 +230,7 @@ class ScheduleController {
       const { range, company_id }: IFilter = req.body;
 
       const schedules = await ScheduleModel.find({
-        company_id: company_id,
+        company_id,
         schedule_date: {
           $gte: range?.start,
           $lte: range?.end,
@@ -278,7 +287,7 @@ class ScheduleController {
       const zipCode =
         client && (client.address.cep.split("-").join("") as string);
 
-      const createPayment: any = await pagarmeService("/transactions", {
+      const data = {
         amount: finalPrice,
 
         card_number: "4111111111111111",
@@ -335,18 +344,24 @@ class ScheduleController {
             amount: appPrice,
           },
         ],
+      };
+
+      const createPayment: any = await pagarmeService({
+        endpoint: "/transactions",
+        data,
       });
 
       if (createPayment.message) {
+        // eslint-disable-next-line no-throw-literal
         throw createPayment as string;
       }
 
       const schedule = await new ScheduleModel({
-        company_id: company_id,
-        client_id: client_id,
-        worker_id: worker_id,
-        service_id: service_id,
-        schedule_date: schedule_date,
+        company_id,
+        client_id,
+        worker_id,
+        service_id,
+        schedule_date,
         price: finalPrice,
         transaction_id: createPayment?.data?.id as string,
       }).save({
@@ -365,10 +380,6 @@ class ScheduleController {
         .send({ message: "Erro ao criar horário", error: error.message });
     }
   }
-
-  async update(req: Request, res: Response) {}
-
-  async delete(req: Request, res: Response) {}
 }
 
 export default new ScheduleController();

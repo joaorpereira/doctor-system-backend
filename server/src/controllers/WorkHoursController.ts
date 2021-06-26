@@ -1,9 +1,9 @@
 import { Response, Request } from "express";
+import * as _ from "lodash";
 import { WorkerServiceModel } from "../models/relations/workerService/workerServiceModel";
 import { Status } from "../models/relations/workerService/workerServiceTypes";
 import { WorkHoursModel } from "../models/workHours/workHoursModel";
 import { IWorkHours, IWorkHoursBody } from "../models/workHours/workHoursTypes";
-import * as _ from "lodash";
 
 type ListOfWorkers = {
   label: string;
@@ -29,13 +29,14 @@ class WorkHoursController {
 
       const servicesByWorkers = await WorkerServiceModel.find({
         service_id: { $in: services },
-        status: Status["ATIVO"],
+        status: Status.ATIVO,
       })
         .populate("worker_id", "name")
         .select("worker_id -_id");
 
       const listOfWorkers: ListOfWorkers[] = _.unionBy(
         servicesByWorkers,
+        // eslint-disable-next-line no-underscore-dangle
         (worker: any) => worker.worker_id._id.toString()
       ).map((worker: any) => ({
         label: worker.worker_id.name,
@@ -53,7 +54,7 @@ class WorkHoursController {
   async create(req: Request, res: Response) {
     try {
       const data = req.body;
-      const work_hours : IWorkHours = await new WorkHoursModel(data).save();
+      const work_hours: IWorkHours = await new WorkHoursModel(data).save();
       res.status(201).send({ work_hours });
     } catch (error) {
       res

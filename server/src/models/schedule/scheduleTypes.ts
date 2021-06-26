@@ -6,12 +6,12 @@ export type ISchedule = {
   worker_id: string;
   service_id: string;
   schedule_date: Date;
-  price: Number;
-  transaction_id: String;
+  price: number;
+  transaction_id: string;
   created_at: Date;
   updated_at: Date;
 };
 
 export interface IScheduleDocument extends ISchedule, Document {}
 
-export interface IScheduleModel extends Model<IScheduleDocument> {}
+export type IScheduleModel = Model<IScheduleDocument>;

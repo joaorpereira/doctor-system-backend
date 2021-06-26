@@ -1,21 +1,21 @@
-import mongoose, { Schema } from 'mongoose'
+import mongoose, { Schema } from "mongoose";
 
 const companyClient = new Schema({
   company_id: {
     type: mongoose.Types.ObjectId,
-    ref: 'Companies',
+    ref: "Companies",
     required: true,
   },
   client_id: {
     type: mongoose.Types.ObjectId,
-    ref: 'Clients',
+    ref: "Clients",
     required: true,
   },
   status: {
     type: String,
-    enum: ['ATIVO', 'INATIVO'],
+    enum: ["ATIVO", "INATIVO"],
     required: true,
-    default: 'ATIVO',
+    default: "ATIVO",
   },
   created_at: {
     type: Date,
@@ -25,6 +25,6 @@ const companyClient = new Schema({
     type: Date,
     default: new Date(),
   },
-})
+});
 
-export default companyClient
+export default companyClient;

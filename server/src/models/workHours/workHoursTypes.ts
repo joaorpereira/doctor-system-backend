@@ -4,7 +4,7 @@ export type IWorkHours = {
   company_id: string;
   services: string[];
   workers: string[];
-  days: Number[];
+  days: number[];
   start_time: Date;
   end_time: Date;
   created_at?: Date;
@@ -14,7 +14,7 @@ export type IWorkHours = {
 export type IWorkHoursBody = {
   services: string[];
   workers: string[];
-  days: Number[];
+  days: number[];
   start_time: Date;
   end_time: Date;
   created_at?: Date;
@@ -23,4 +23,4 @@ export type IWorkHoursBody = {
 
 export interface IWorkHoursDocument extends IWorkHours, Document {}
 
-export interface IWorkHoursModel extends Model<IWorkHoursDocument> {}
+export type IWorkHoursModel = Model<IWorkHoursDocument>;

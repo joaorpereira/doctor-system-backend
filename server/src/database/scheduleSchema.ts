@@ -1,24 +1,24 @@
-import mongoose, { Schema } from 'mongoose'
+import mongoose, { Schema } from "mongoose";
 
 const schedule = new Schema({
   company_id: {
     type: mongoose.Types.ObjectId,
-    ref: 'Companies',
+    ref: "Companies",
     required: true,
   },
   client_id: {
     type: mongoose.Types.ObjectId,
-    ref: 'Clients',
+    ref: "Clients",
     required: true,
   },
   service_id: {
     type: mongoose.Types.ObjectId,
-    ref: 'Services',
+    ref: "Services",
     required: true,
   },
   worker_id: {
     type: mongoose.Types.ObjectId,
-    ref: 'Workers',
+    ref: "Workers",
     required: true,
   },
   schedule_date: {
@@ -41,6 +41,6 @@ const schedule = new Schema({
     type: Date,
     default: new Date(),
   },
-})
+});
 
-export default schedule
+export default schedule;

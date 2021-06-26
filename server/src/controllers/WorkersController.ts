@@ -5,12 +5,7 @@ import { CompanyWorkerModel } from "../models/relations/companyWorker/companyWor
 import { WorkerServiceModel } from "../models/relations/workerService/workerServiceModel";
 import { Status } from "../models/relations/companyWorker/companyWorkerTypes";
 import { pagarmeService } from "../services/pargar-me";
-import {
-  IWorkers,
-  IBankAccount,
-  IDocument,
-  AccountType,
-} from "../models/workers/workersTypes";
+import { IWorkers } from "../models/workers/workersTypes";
 import {
   IWorkerData,
   ICompanyWorkers,
@@ -62,11 +57,11 @@ class WorkersController {
 
       let newWorker = null;
 
-      if (!worker) {
-        const bank_account: IBankAccount = worker_data.bank_account;
-        const document: IDocument = worker_data.document;
+      if (!worker && worker_data) {
+        const { bank_account } = worker_data;
+        const { document } = worker_data;
 
-        const pagarMeBankAccount = await pagarmeService("bank_accounts", {
+        const bankAccounData = {
           agencia: bank_account.bank_agency,
           bank_code: bank_account.bank_code,
           conta: bank_account.acc_number,
@@ -74,19 +69,31 @@ class WorkersController {
           document_number: document.number,
           legal_name: bank_account.acc_user_name,
           type: bank_account.acc_type,
+        };
+
+        const pagarMeBankAccount = await pagarmeService({
+          endpoint: "bank_accounts",
+          data: bankAccounData,
         });
 
         if (pagarMeBankAccount.message) {
+          // eslint-disable-next-line no-throw-literal
           throw pagarMeBankAccount as string;
         }
 
-        const pagarMeRecipient = await pagarmeService("recipients", {
+        const recipientData = {
           transfer_interval: "daily",
           transfer_enabled: true,
           bank_account_id: pagarMeBankAccount?.data?.id,
+        };
+
+        const pagarMeRecipient = await pagarmeService({
+          endpoint: "recipients",
+          data: recipientData,
         });
 
         if (pagarMeRecipient.message) {
+          // eslint-disable-next-line no-throw-literal
           throw pagarMeRecipient as string;
         }
 
@@ -204,14 +211,16 @@ class WorkersController {
 
       const listWorkersByCompany = await CompanyWorkerModel.find({
         company_id,
-        status: { $ne: Status["REMOVIDO"] },
+        status: { $ne: Status.REMOVIDO },
       })
         .populate({ path: "worker_id", select: "-password -recipient_id" })
         .select("worker_id created_at status");
 
-      for (let worker of listWorkersByCompany) {
+      // eslint-disable-next-line no-restricted-syntax
+      for (const worker of listWorkersByCompany) {
         const workerDoc = worker._doc;
         const workerData: IWorkerData = worker.worker_id as any;
+        // eslint-disable-next-line no-await-in-loop
         const workerServices = await WorkerServiceModel.find({
           worker_id: workerData._id,
         });

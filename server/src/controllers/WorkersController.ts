@@ -1,72 +1,72 @@
-import mongoose from 'mongoose'
-import { Request, Response } from 'express'
-import { WorkersModel } from '../models/workers/workersModel'
-import { CompanyWorkerModel } from '../models/relations/companyWorker/companyWorkerModel'
-import { WorkerServiceModel } from '../models/relations/workerService/workerServiceModel'
-import { Status } from '../models/relations/companyWorker/companyWorkerTypes'
-import { pagarmeService } from '../services/pargar-me'
+import mongoose from "mongoose";
+import { Request, Response } from "express";
+import { WorkersModel } from "../models/workers/workersModel";
+import { CompanyWorkerModel } from "../models/relations/companyWorker/companyWorkerModel";
+import { WorkerServiceModel } from "../models/relations/workerService/workerServiceModel";
+import { Status } from "../models/relations/companyWorker/companyWorkerTypes";
+import { pagarmeService } from "../services/pargar-me";
 import {
   IWorkers,
   IBankAccount,
   IDocument,
   AccountType,
-} from '../models/workers/workersTypes'
+} from "../models/workers/workersTypes";
 import {
   IWorkerData,
   ICompanyWorkers,
-} from '../models/relations/workerService/workerServiceTypes'
+} from "../models/relations/workerService/workerServiceTypes";
 
 class WorkersController {
   async getAllWorkers(req: Request, res: Response) {
     try {
-      const workers = await WorkersModel.find()
-      res.status(200).send({ workers })
+      const workers = await WorkersModel.find();
+      res.status(200).send({ workers });
     } catch (error) {
       res
         .status(404)
-        .send({ message: 'Lista de colaboradores não encontrada', error })
+        .send({ message: "Lista de colaboradores não encontrada", error });
     }
   }
 
   async getWorker(req: Request, res: Response) {
     try {
-      const { id } = req.params
+      const { id } = req.params;
 
-      const worker = await WorkersModel.findById(id)
+      const worker = await WorkersModel.findById(id);
 
-      res.status(200).send({ worker })
+      res.status(200).send({ worker });
     } catch (error) {
-      res.status(404).send({ message: 'Colaborador não encontrado', error })
+      res.status(404).send({ message: "Colaborador não encontrado", error });
     }
   }
 
   async create(req: Request, res: Response) {
-    const db = mongoose.connection
-    const session = await db.startSession()
-    session.startTransaction()
+    const db = mongoose.connection;
+    const session = await db.startSession();
+    session.startTransaction();
 
-    let message = 'Erro ao criar colaborador'
+    let message = "Erro ao criar colaborador";
 
     try {
       const {
         company_id,
         worker_data,
-      }: { company_id: string; worker_data: IWorkers } = req.body
+      }: { company_id: string; worker_data: IWorkers } = req.body;
 
       const worker = await WorkersModel.findOne({
         $or: [
           { email: worker_data.email },
           { phone_number: worker_data.phone_number },
         ],
-      })
+      });
 
-      let newWorker = null
+      let newWorker = null;
 
       if (!worker) {
-        const bank_account: IBankAccount = worker_data.bank_account
-        const document: IDocument = worker_data.document
+        const bank_account: IBankAccount = worker_data.bank_account;
+        const document: IDocument = worker_data.document;
 
-        const pagarMeBankAccount = await pagarmeService('bank_accounts', {
+        const pagarMeBankAccount = await pagarmeService("bank_accounts", {
           agencia: bank_account.bank_agency,
           bank_code: bank_account.bank_code,
           conta: bank_account.acc_number,
@@ -74,20 +74,20 @@ class WorkersController {
           document_number: document.number,
           legal_name: bank_account.acc_user_name,
           type: bank_account.acc_type,
-        })
+        });
 
         if (pagarMeBankAccount.message) {
-          throw pagarMeBankAccount as string
+          throw pagarMeBankAccount as string;
         }
 
-        const pagarMeRecipient = await pagarmeService('recipients', {
-          transfer_interval: 'daily',
+        const pagarMeRecipient = await pagarmeService("recipients", {
+          transfer_interval: "daily",
           transfer_enabled: true,
           bank_account_id: pagarMeBankAccount?.data?.id,
-        })
+        });
 
         if (pagarMeRecipient.message) {
-          throw pagarMeRecipient as string
+          throw pagarMeRecipient as string;
         }
 
         // create worker
@@ -95,14 +95,16 @@ class WorkersController {
         newWorker = await new WorkersModel({
           ...worker_data,
           recipient_id: pagarMeRecipient?.data?.id as string,
-        }).save({ session })
+        }).save({ session });
       }
 
-      const worker_id: string = worker ? worker._id : (newWorker?._id as string)
+      const worker_id: string = worker
+        ? worker._id
+        : (newWorker?._id as string);
 
       const newStatus: Status = (
         worker ? worker.status : newWorker?.status
-      ) as Status
+      ) as Status;
 
       const verifyRelationship = await CompanyWorkerModel.findOne({
         company_id,
@@ -110,14 +112,14 @@ class WorkersController {
         status: {
           $ne: Status[newStatus],
         },
-      })
+      });
 
       if (!verifyRelationship) {
         await new CompanyWorkerModel({
           company_id,
           worker_id,
           status: newStatus,
-        }).save({ session })
+        }).save({ session });
       }
 
       if (verifyRelationship) {
@@ -128,94 +130,92 @@ class WorkersController {
           },
           { status: newStatus },
           { session }
-        )
+        );
       }
 
       await WorkerServiceModel.insertMany(
-        worker_data?.services?.map(
-          (serviceId: string) => ({
-            service_id: serviceId,
-            worker_id,
-          }),
-          { session }
-        ) as []
-      )
+        worker_data?.services?.map((serviceId: string) => ({
+          service_id: serviceId,
+          worker_id,
+        })) as []
+      );
 
-      await session.commitTransaction()
-      session.endSession()
+      await session.commitTransaction();
+      session.endSession();
 
       if (worker && verifyRelationship) {
-        message = 'Colaborador já cadastrado'
-        throw new Error(message)
+        message = "Colaborador já cadastrado";
+        throw new Error(message);
       } else {
         res.status(201).send({
           worker: worker ?? newWorker,
-          message: 'Colaborador criado com sucesso',
-        })
+          message: "Colaborador criado com sucesso",
+        });
       }
     } catch (error) {
-      await session.abortTransaction()
-      session.endSession()
-      res.status(404).send({ message, error: error.message })
+      await session.abortTransaction();
+      session.endSession();
+      res.status(404).send({ message, error: error.message });
     }
   }
 
   async update(req: Request, res: Response) {
-    const { id } = req.params
-    const data = req.body
+    const { id } = req.params;
+    const data = req.body;
     try {
       const update = {
         ...data,
-        password: data.password && data.password,
-        picture: data.picture && data.picture,
-        phone_number: data.phone_number && data.phone_number,
-      }
+        password: data.password,
+        picture: data.picture,
+        phone_number: data.phone_number,
+      };
 
-      const company = await WorkersModel.findOneAndUpdate({ _id: id }, update, {
+      const worker = await WorkersModel.findOneAndUpdate({ _id: id }, update, {
         returnOriginal: false,
-      })
+      });
 
       res
         .status(200)
-        .send({ company, message: 'Colaborador alterado com sucesso' })
+        .send({ worker, message: "Colaborador alterado com sucesso" });
     } catch (error) {
       res
         .status(404)
-        .send({ message: 'Erro ao alterar colaborador', error: error.message })
+        .send({ message: "Erro ao alterar colaborador", error: error.message });
     }
   }
 
   async delete(req: Request, res: Response) {
     try {
-      const { id } = req.params
-      await WorkersModel.deleteOne({ _id: id })
-      res.status(200).send({ message: 'Colaborador removido com sucesso' })
+      const { id } = req.params;
+      await WorkersModel.deleteOne({ _id: id });
+      await CompanyWorkerModel.deleteOne({ worker_id: id });
+      res.status(200).send({ message: "Colaborador removido com sucesso" });
     } catch (error) {
       res
         .status(404)
-        .send({ message: 'Erro ao remover colaborador', error: error.message })
+        .send({ message: "Erro ao remover colaborador", error: error.message });
     }
   }
 
   async listWorkersByCompany(req: Request, res: Response) {
     try {
-      const { company_id } = req.params
-      let newListOfWorkers: any = []
+      const { company_id } = req.params;
+      let newListOfWorkers: any = [];
 
       const listWorkersByCompany = await CompanyWorkerModel.find({
         company_id,
-        status: { $ne: Status['REMOVIDO'] },
+        status: { $ne: Status["REMOVIDO"] },
       })
-        .populate({ path: 'worker_id', select: '-password -recipient_id' })
-        .select('worker_id created_at status')
+        .populate({ path: "worker_id", select: "-password -recipient_id" })
+        .select("worker_id created_at status");
 
       for (let worker of listWorkersByCompany) {
-        const workerDoc = worker._doc
-        const workerData: IWorkerData = worker.worker_id as any
+        const workerDoc = worker._doc;
+        const workerData: IWorkerData = worker.worker_id as any;
         const workerServices = await WorkerServiceModel.find({
           worker_id: workerData._id,
-        })
-        newListOfWorkers = [{ ...workerDoc, workerServices }]
+        });
+        newListOfWorkers = [{ ...workerDoc, workerServices }];
       }
 
       const lifOfWorkers: ICompanyWorkers = newListOfWorkers.map(
@@ -226,16 +226,16 @@ class WorkersController {
           services: item.workerServices,
           created_at: item.created_at,
         })
-      )
+      );
 
-      res.status(200).send({ lifOfWorkers })
+      res.status(200).send({ lifOfWorkers });
     } catch (error) {
       res.status(404).send({
-        message: 'Lista de colaboradores não encontrada',
+        message: "Lista de colaboradores não encontrada",
         error: error.message,
-      })
+      });
     }
   }
 }
 
-export default new WorkersController()
+export default new WorkersController();

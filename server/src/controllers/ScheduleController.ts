@@ -139,7 +139,8 @@ class ScheduleController {
             // recover scheduled time
             const busySchedule = unfilteredSchedule
               .map((schedule) => {
-                const duration: any = schedule.service_id as ObjectId;
+                const duration: any =
+                  schedule.service_id as unknown as ObjectId;
                 const totalMinutes = convertHourToMinutes(
                   duration.service_duration
                 );
@@ -240,6 +241,7 @@ class ScheduleController {
         { path: "worker_id", select: "name" },
         { path: "client_id", select: "name" },
       ]);
+
       res.status(200).send({ schedules });
     } catch (error) {
       res

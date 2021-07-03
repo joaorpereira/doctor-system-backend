@@ -13,7 +13,9 @@ class WorkHoursController {
   async getWorkHoursByCompany(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const company_work_hours = await WorkHoursModel.find({ company_id: id });
+      const company_work_hours = await WorkHoursModel.find({
+        company_id: id,
+      }).select(" -updated_at -__v");
       res.status(201).send({ company_work_hours });
     } catch (error) {
       res.status(404).send({

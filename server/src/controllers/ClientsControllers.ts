@@ -2,13 +2,13 @@ import mongoose from "mongoose";
 import { Request, Response } from "express";
 import { pagarmeService } from "../services/pargar-me";
 import { ClientsModel } from "../models/clients/clientsModel";
-import { IClients, Status, DocumentType } from "../models/clients/clientsTypes";
+import { IClients, Status } from "../models/clients/clientsTypes";
 import { CompanyClientModel } from "../models/relations/companyClient/companyClientModel";
 
 class ClientsControllers {
   async getAllClients(req: Request, res: Response) {
     try {
-      const clients = await ClientsModel.find();
+      const clients = await ClientsModel.find().select(" -updated_at -__v");
       res.status(200).send({ clients });
     } catch (error) {
       res.status(404).send({
@@ -21,7 +21,9 @@ class ClientsControllers {
   async getClient(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const client = await ClientsModel.findById(id);
+      const client = await ClientsModel.findById(id).select(
+        " -updated_at -__v"
+      );
 
       res.status(200).send({ client });
     } catch (error) {
@@ -34,7 +36,9 @@ class ClientsControllers {
   async filteredClientList(req: Request, res: Response) {
     try {
       const { filters } = req.body;
-      const clients = await ClientsModel.find(filters);
+      const clients = await ClientsModel.find(filters).select(
+        " -updated_at -__v"
+      );
 
       res
         .status(200)
@@ -74,9 +78,7 @@ class ClientsControllers {
           external_id: _id,
           name: client_data.name,
           type:
-            client_data.document.type === DocumentType.cpf
-              ? "individual"
-              : "corporations",
+            client_data.document.type === "cpf" ? "individual" : "corporations",
           country: client_data.address.country,
           email: client_data.email,
           documents: [
@@ -162,7 +164,8 @@ class ClientsControllers {
 
     try {
       const update = {
-        ...data,
+        name: data.name,
+        email: data.email,
         password: data.password,
         picture: data.picture,
         phone_number: data.phone_number,
@@ -171,13 +174,13 @@ class ClientsControllers {
 
       const client = await ClientsModel.findOneAndUpdate({ _id: id }, update, {
         returnOriginal: false,
-      });
+      }).select(" -updated_at -__v -customer_id");
 
       if (!client) {
         throw new Error("Dados do cliente não foram encontrados");
       }
 
-      res.status(200).send({ message: "Cliente alterado com sucesso" });
+      res.status(200).send({ message: "Cliente alterado com sucesso", client });
     } catch (error) {
       res.status(404).send({
         message: "Erro ao alterar dados do cliente",

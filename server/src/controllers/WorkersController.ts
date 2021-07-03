@@ -14,7 +14,7 @@ import {
 class WorkersController {
   async getAllWorkers(req: Request, res: Response) {
     try {
-      const workers = await WorkersModel.find();
+      const workers = await WorkersModel.find().select(" -updated_at -__v");
       res.status(200).send({ workers });
     } catch (error) {
       res
@@ -27,7 +27,9 @@ class WorkersController {
     try {
       const { id } = req.params;
 
-      const worker = await WorkersModel.findById(id);
+      const worker = await WorkersModel.findById(id).select(
+        " -updated_at -__v"
+      );
 
       res.status(200).send({ worker });
     } catch (error) {
@@ -169,17 +171,20 @@ class WorkersController {
   async update(req: Request, res: Response) {
     const { id } = req.params;
     const data = req.body;
+
     try {
       const update = {
-        ...data,
+        name: data.name,
+        email: data.email,
         password: data.password,
         picture: data.picture,
+        services: data.services,
         phone_number: data.phone_number,
       };
 
       const worker = await WorkersModel.findOneAndUpdate({ _id: id }, update, {
         returnOriginal: false,
-      });
+      }).select(" -updated_at -__v");
 
       res
         .status(200)

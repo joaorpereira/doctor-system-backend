@@ -22,7 +22,7 @@ class ServicesController {
       const services = await ServicesModel.find({
         company_id: id,
         status: { $ne: Status.REMOVIDO },
-      });
+      }).select(" -updated_at -__v");
 
       // eslint-disable-next-line no-restricted-syntax
       for (const service of services) {
@@ -187,7 +187,7 @@ class ServicesController {
 
             const path = `services/${jsonService.company_id}/${fileName}`;
 
-            const response = (await uploadToS3(file, path)) as any;
+            const response = (await uploadToS3({ file, path })) as any;
             if (response.error) {
               errors.push({ error: response.error });
             } else files.push(path);

@@ -7,7 +7,7 @@ import { pagarmeService } from "../services/pargar-me";
 class CompaniesController {
   async getCompanyList(req: Request, res: Response) {
     try {
-      const companies = await CompaniesModel.find();
+      const companies = await CompaniesModel.find().select(" -updated_at -__v");
       res.status(200).send({ companies });
     } catch (error) {
       res.status(404).send({
@@ -21,7 +21,9 @@ class CompaniesController {
     try {
       const { id, lat: user_lat, lon: user_lon } = req.params;
 
-      const company = await CompaniesModel.findById(id);
+      const company = await CompaniesModel.findById(id).select(
+        " -updated_at -__v"
+      );
       let distance = 0;
 
       if (company) {
@@ -146,7 +148,7 @@ class CompaniesController {
         {
           returnOriginal: false,
         }
-      );
+      ).select(" -updated_at -__v");
 
       res
         .status(200)

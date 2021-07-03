@@ -31,7 +31,7 @@ class ServicesController {
           reference_id: service._id,
         });
         newServices.push({
-          service: service._doc,
+          ...service._doc,
           files,
         });
       }
@@ -251,6 +251,7 @@ class ServicesController {
       }
 
       res.status(200).send({
+        services: service,
         message: `Status do serviço atualizado com sucesso. Novo status: ${newStatus}`,
       });
     } catch (error) {

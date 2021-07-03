@@ -10,14 +10,9 @@ export enum Status {
   INATIVO = "INATIVO",
 }
 
-export enum DocumentType {
-  cpf = "cpf",
-  cnpj = "cnpj",
-}
-
 export type IDocument = {
   number: string;
-  type: DocumentType;
+  type: "cpf" | "cnpj";
 };
 
 export type IAddress = {

@@ -18,13 +18,9 @@ export enum AccountType {
   conta_corrente_conjunta = "conta_corrente_conjunta",
 }
 
-export enum DocumentType {
-  cpf = "cpf",
-  cnpj = "cnpj",
-}
 export type IDocument = {
   number: string;
-  type: DocumentType;
+  type: "cpf" | "cnpj";
 };
 
 export type IBankAccount = {

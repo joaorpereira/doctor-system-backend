@@ -75,6 +75,11 @@ const WorkersSchema = new Schema({
       required: true,
     },
   },
+  services: [
+    {
+      type: String,
+    },
+  ],
   recipient_id: {
     type: String,
     required: true,

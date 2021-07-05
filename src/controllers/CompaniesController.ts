@@ -4,9 +4,48 @@ import { CompaniesModel } from "../models/companies/companiesModel";
 import { getDistance } from "../services/distance";
 import { pagarmeService } from "../services/pargar-me";
 import { Status } from "../models/companies/companiesTypes";
-import { hashPassword } from "../services/hashPassword";
+import { hashPassword, comparePassword } from "../services/hashPassword";
 
 class CompaniesController {
+  async login(req: Request, res: Response) {
+    let statusCode = 404;
+    let message = "Erro ao efetuar login";
+
+    const { email, password } = req.body;
+
+    try {
+      if (!email || !password) {
+        statusCode = 406;
+        message = "Email e senha são campos obrigatórios";
+        throw new Error(message);
+      }
+      const company: any = await CompaniesModel.findOne({
+        email,
+      });
+
+      if (!company) {
+        statusCode = 404;
+        message = "Empresa não encontrada ou senha incorreta";
+        throw new Error(message);
+      }
+
+      const comparedPassword = comparePassword(password, company.password);
+
+      if (!comparedPassword) {
+        statusCode = 401;
+        message = "Empresa não encontrada ou senha incorreta";
+        throw new Error(message);
+      }
+
+      res.status(200).send({ company, message: "Usuário logado com sucesso" });
+    } catch (error) {
+      res.status(statusCode).send({
+        message,
+        error: error.message,
+      });
+    }
+  }
+
   async getCompanyList(req: Request, res: Response) {
     try {
       const companies = await CompaniesModel.find().select(" -updated_at -__v");

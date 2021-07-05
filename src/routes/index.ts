@@ -10,6 +10,7 @@ import ScheduleController from "../controllers/ScheduleController";
 const router = express.Router();
 
 // === company ===
+router.post("/company/login", CompaniesController.login);
 router.post("/company", CompaniesController.create);
 router.get("/company", CompaniesController.getCompanyList);
 router.get("/company/filter", CompaniesController.getFilteredCompanyList);
@@ -28,6 +29,7 @@ router.delete("/service/:id/:status", ServicesController.removeInactiveService);
 router.post("/file", FilesController.delete);
 
 // === worker ===
+router.post("/worker/login", WorkersController.login);
 router.post("/worker", WorkersController.create);
 router.get("/worker", WorkersController.getAllWorkers);
 router.get("/worker/info/:id", WorkersController.getWorker);
@@ -43,6 +45,7 @@ router.put("/work-hours/:id", WorkHoursController.update);
 router.delete("/work-hours/:id", WorkHoursController.delete);
 
 // === client ===
+router.post("/client/login", ClientsControllers.login);
 router.post("/client", ClientsControllers.create);
 router.post("/client/filter", ClientsControllers.filteredClientList);
 router.get("/client", ClientsControllers.getAllClients);

@@ -10,9 +10,50 @@ import {
   IWorkerData,
   ICompanyWorkers,
 } from "../models/relations/workerService/workerServiceTypes";
-import { hashPassword } from "../services/hashPassword";
+import { hashPassword, comparePassword } from "../services/hashPassword";
 
 class WorkersController {
+  async login(req: Request, res: Response) {
+    let statusCode = 404;
+    let message = "Erro ao efetuar login";
+
+    const { email, password } = req.body;
+
+    try {
+      if (!email || !password) {
+        statusCode = 406;
+        message = "Email e senha são campos obrigatórios";
+        throw new Error(message);
+      }
+      const worker: any = await WorkersModel.findOne({
+        email,
+      });
+
+      if (!worker) {
+        statusCode = 404;
+        message = "Colaborador não encontrado ou senha incorreta";
+        throw new Error(message);
+      }
+
+      const comparedPassword = comparePassword(password, worker.password);
+
+      if (!comparedPassword) {
+        statusCode = 401;
+        message = "Colaborador não encontrado ou senha incorreta";
+        throw new Error(message);
+      }
+
+      res
+        .status(200)
+        .send({ worker, message: "Colaborador logado com sucesso" });
+    } catch (error) {
+      res.status(statusCode).send({
+        message,
+        error: error.message,
+      });
+    }
+  }
+
   async getAllWorkers(req: Request, res: Response) {
     try {
       const workers = await WorkersModel.find().select(" -updated_at -__v");

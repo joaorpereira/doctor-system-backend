@@ -4,9 +4,48 @@ import { pagarmeService } from "../services/pargar-me";
 import { ClientsModel } from "../models/clients/clientsModel";
 import { IClients, Status } from "../models/clients/clientsTypes";
 import { CompanyClientModel } from "../models/relations/companyClient/companyClientModel";
-import { hashPassword } from "../services/hashPassword";
+import { hashPassword, comparePassword } from "../services/hashPassword";
 
 class ClientsControllers {
+  async login(req: Request, res: Response) {
+    let statusCode = 404;
+    let message = "Erro ao efetuar login";
+
+    const { email, password } = req.body;
+
+    try {
+      if (!email || !password) {
+        statusCode = 406;
+        message = "Email e senha são campos obrigatórios";
+        throw new Error(message);
+      }
+      const client: any = await ClientsModel.findOne({
+        email,
+      });
+
+      if (!client) {
+        statusCode = 404;
+        message = "Usuário não encontrado ou senha incorreta";
+        throw new Error(message);
+      }
+
+      const comparedPassword = comparePassword(password, client.password);
+
+      if (!comparedPassword) {
+        statusCode = 401;
+        message = "Usuário não encontrado ou senha incorreta";
+        throw new Error(message);
+      }
+
+      res.status(200).send({ client, message: "Usuário logado com sucesso" });
+    } catch (error) {
+      res.status(statusCode).send({
+        message,
+        error: error.message,
+      });
+    }
+  }
+
   async getAllClients(req: Request, res: Response) {
     try {
       const clients = await ClientsModel.find().select(" -updated_at -__v");

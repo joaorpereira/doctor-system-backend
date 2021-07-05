@@ -73,7 +73,7 @@ class ServicesController {
     }
   }
 
-  async uploadAWS(req: Request, res: Response) {
+  async create(req: Request, res: Response) {
     const { service } = req.body;
 
     const documentFile = (req as IBusboyRequest).files;
@@ -137,8 +137,7 @@ class ServicesController {
         }
 
         res.status(201).send({
-          files: newFiles,
-          service: newService,
+          service: { ...newService._doc, files: newFiles },
           message: "Serviço criado com sucesso",
         });
       });
@@ -224,6 +223,7 @@ class ServicesController {
         }
 
         res.status(200).send({
+          service: { ...newService, files: newFiles },
           message: "Serviço atualizado com sucesso",
         });
       });

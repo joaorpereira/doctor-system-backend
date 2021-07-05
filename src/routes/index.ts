@@ -19,7 +19,7 @@ router.put("/company/:id", CompaniesController.update);
 router.delete("/company/:id", CompaniesController.delete);
 
 // === service ===
-router.post("/service", ServicesController.uploadAWS);
+router.post("/service", ServicesController.create);
 router.get("/service/:id", ServicesController.getServicesList);
 router.get("/service/filter/:id", ServicesController.getFilteredServicesList);
 router.put("/service/:id", ServicesController.update);

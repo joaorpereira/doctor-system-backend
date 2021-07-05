@@ -94,6 +94,12 @@ const CompaniesSchema = new Schema({
       unique: [true, "CPF/CNPJ já cadastrado"],
     },
   },
+  role: {
+    type: String,
+    enum: ["ADMIN", "COMPANY"],
+    DEFAULT: "COMPANY",
+    required: true,
+  },
   recipient_id: {
     type: String,
     required: true,

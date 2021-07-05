@@ -75,6 +75,11 @@ const WorkersSchema = new Schema({
       required: true,
     },
   },
+  role: {
+    type: String,
+    DEFAULT: "WORKER",
+    required: true,
+  },
   services: [
     {
       type: String,

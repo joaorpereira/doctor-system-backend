@@ -68,6 +68,11 @@ const ClientsSchema = new Schema({
       required: true,
     },
   },
+  role: {
+    type: String,
+    DEFAULT: "CLIENT",
+    required: true,
+  },
   customer_id: String,
   created_at: {
     type: Date,

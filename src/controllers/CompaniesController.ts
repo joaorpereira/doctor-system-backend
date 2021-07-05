@@ -159,10 +159,12 @@ class CompaniesController {
       const { id } = req.params;
       const data = req.body;
 
+      const hashedPassword = await hashPassword(data.password);
+
       const update = {
         ...data,
         name: data.name,
-        password: data.password,
+        password: hashedPassword,
         picture: data.picture,
         background: data.background,
         phone_number: data.phone_number,

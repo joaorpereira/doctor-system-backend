@@ -4,7 +4,7 @@ import { pagarmeService } from "../services/pargar-me";
 import { ClientsModel } from "../models/clients/clientsModel";
 import { IClients, Status } from "../models/clients/clientsTypes";
 import { CompanyClientModel } from "../models/relations/companyClient/companyClientModel";
-import { comparePaswword, hashPassword } from "../services/hashPassword";
+import { hashPassword } from "../services/hashPassword";
 
 class ClientsControllers {
   async getAllClients(req: Request, res: Response) {
@@ -166,11 +166,13 @@ class ClientsControllers {
     const { id } = req.params;
     const data = req.body;
 
+    const hashedPassword = await hashPassword(data.password);
+
     try {
       const update = {
         name: data.name,
         email: data.email,
-        password: data.password,
+        password: hashedPassword,
         picture: data.picture,
         phone_number: data.phone_number,
         address: data.address,

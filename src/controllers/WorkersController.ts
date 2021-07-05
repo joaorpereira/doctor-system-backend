@@ -10,6 +10,7 @@ import {
   IWorkerData,
   ICompanyWorkers,
 } from "../models/relations/workerService/workerServiceTypes";
+import { hashPassword } from "../services/hashPassword";
 
 class WorkersController {
   async getAllWorkers(req: Request, res: Response) {
@@ -99,10 +100,12 @@ class WorkersController {
           throw pagarMeRecipient as string;
         }
 
-        // create worker
+        const hashedPassword = await hashPassword(worker_data.password);
 
+        // create worker
         newWorker = await new WorkersModel({
           ...worker_data,
+          password: hashedPassword,
           recipient_id: pagarMeRecipient?.data?.id as string,
         }).save({ session });
       }
@@ -172,11 +175,13 @@ class WorkersController {
     const { id } = req.params;
     const data = req.body;
 
+    const hashedPassword = await hashPassword(data.password);
+
     try {
       const update = {
         name: data.name,
         email: data.email,
-        password: data.password,
+        password: hashedPassword,
         picture: data.picture,
         services: data.services,
         phone_number: data.phone_number,

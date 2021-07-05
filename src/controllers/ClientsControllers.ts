@@ -4,6 +4,7 @@ import { pagarmeService } from "../services/pargar-me";
 import { ClientsModel } from "../models/clients/clientsModel";
 import { IClients, Status } from "../models/clients/clientsTypes";
 import { CompanyClientModel } from "../models/relations/companyClient/companyClientModel";
+import { comparePaswword, hashPassword } from "../services/hashPassword";
 
 class ClientsControllers {
   async getAllClients(req: Request, res: Response) {
@@ -101,10 +102,13 @@ class ClientsControllers {
           throw pagarMeCustomer as string;
         }
 
+        const hashedPassword = await hashPassword(client_data.password);
+
         // create client
         newClient = await new ClientsModel({
           ...client_data,
           _id,
+          password: hashedPassword,
           customer_id: pagarMeCustomer?.data?.id as string,
         }).save({ session });
       }

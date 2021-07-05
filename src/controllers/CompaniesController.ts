@@ -3,6 +3,8 @@ import { Request, Response } from "express";
 import { CompaniesModel } from "../models/companies/companiesModel";
 import { getDistance } from "../services/distance";
 import { pagarmeService } from "../services/pargar-me";
+import { Status } from "../models/companies/companiesTypes";
+import { hashPassword } from "../services/hashPassword";
 
 class CompaniesController {
   async getCompanyList(req: Request, res: Response) {
@@ -45,6 +47,29 @@ class CompaniesController {
       res
         .status(404)
         .send({ message: "Empresa não localizada", error: error.message });
+    }
+  }
+
+  async getFilteredCompanyList(req: Request, res: Response) {
+    try {
+      const status: Status = Status.ATIVO;
+      const companies = await CompaniesModel.find({
+        status,
+      }).select("_id name");
+
+      const newCompanies = companies.map((s) => ({
+        label: s.name,
+        value: s._id,
+      }));
+
+      res.status(200).send({
+        companies: newCompanies,
+      });
+    } catch (error) {
+      res.status(404).send({
+        message: "Erro ao filtrar lista de empresas",
+        error: error.message,
+      });
     }
   }
 
@@ -107,8 +132,11 @@ class CompaniesController {
         throw pagarMeRecipient as string;
       }
 
+      const hashedPassword = await hashPassword(companyData.password);
+
       newCompany = await new CompaniesModel({
         ...companyData,
+        password: hashedPassword,
         recipient_id: pagarMeRecipient?.data?.id as string,
       }).save({ session });
 

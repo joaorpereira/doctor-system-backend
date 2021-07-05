@@ -12,6 +12,7 @@ const router = express.Router();
 // === company ===
 router.post("/company", CompaniesController.create);
 router.get("/company", CompaniesController.getCompanyList);
+router.get("/company/filter", CompaniesController.getFilteredCompanyList);
 router.get("/company/:id/:lat/:lon", CompaniesController.getCompany);
 router.put("/company/:id", CompaniesController.update);
 router.delete("/company/:id", CompaniesController.delete);

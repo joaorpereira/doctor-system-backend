@@ -5,6 +5,7 @@ import { getDistance } from "../services/distance";
 import { pagarmeService } from "../services/pargar-me";
 import { Status } from "../models/companies/companiesTypes";
 import { hashPassword, comparePassword } from "../services/hashPassword";
+import { generateToken } from "../services/generateToken";
 
 class CompaniesController {
   async login(req: Request, res: Response) {
@@ -37,7 +38,14 @@ class CompaniesController {
         throw new Error(message);
       }
 
-      res.status(200).send({ company, message: "Usuário logado com sucesso" });
+      const token: string = generateToken({
+        id: company.id,
+        role: company.role,
+      });
+
+      res
+        .status(200)
+        .send({ token, company, message: "Usuário logado com sucesso" });
     } catch (error) {
       res.status(statusCode).send({
         message,

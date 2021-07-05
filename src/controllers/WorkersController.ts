@@ -11,6 +11,7 @@ import {
   ICompanyWorkers,
 } from "../models/relations/workerService/workerServiceTypes";
 import { hashPassword, comparePassword } from "../services/hashPassword";
+import { generateToken } from "../services/generateToken";
 
 class WorkersController {
   async login(req: Request, res: Response) {
@@ -43,9 +44,14 @@ class WorkersController {
         throw new Error(message);
       }
 
+      const token: string = generateToken({
+        id: worker.id,
+        role: worker.role,
+      });
+
       res
         .status(200)
-        .send({ worker, message: "Colaborador logado com sucesso" });
+        .send({ token, worker, message: "Colaborador logado com sucesso" });
     } catch (error) {
       res.status(statusCode).send({
         message,

@@ -5,6 +5,7 @@ import { ClientsModel } from "../models/clients/clientsModel";
 import { IClients, Status } from "../models/clients/clientsTypes";
 import { CompanyClientModel } from "../models/relations/companyClient/companyClientModel";
 import { hashPassword, comparePassword } from "../services/hashPassword";
+import { generateToken } from "../services/generateToken";
 
 class ClientsControllers {
   async login(req: Request, res: Response) {
@@ -37,7 +38,14 @@ class ClientsControllers {
         throw new Error(message);
       }
 
-      res.status(200).send({ client, message: "Usuário logado com sucesso" });
+      const token: string = generateToken({
+        id: client.id,
+        role: client.role,
+      });
+
+      res
+        .status(200)
+        .send({ token, client, message: "Usuário logado com sucesso" });
     } catch (error) {
       res.status(statusCode).send({
         message,

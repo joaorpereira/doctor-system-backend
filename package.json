@@ -14,6 +14,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.2",
     "@types/busboy": "^0.2.3",
     "@types/connect-busboy": "0.0.2",
     "@types/cors": "^2.8.9",
@@ -40,6 +41,7 @@
   "dependencies": {
     "aws-sdk": "^2.906.0",
     "axios": "^0.21.1",
+    "bcryptjs": "^2.4.3",
     "busboy": "^0.3.1",
     "busboy-body-parser": "^0.3.2",
     "connect-busboy": "0.0.2",

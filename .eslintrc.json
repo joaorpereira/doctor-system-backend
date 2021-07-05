@@ -33,7 +33,8 @@
     "no-shadow": "off",
     "class-methods-use-this": "off",
     "no-underscore-dangle": "off",
-    "no-plusplus": "off"
+    "no-plusplus": "off",
+    "import/no-unresolved": [2, { "caseSensitive": false }]
   },
   "settings": {
     "import/resolver": {

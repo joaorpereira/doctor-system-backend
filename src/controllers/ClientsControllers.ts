@@ -5,7 +5,7 @@ import { ClientsModel } from "../models/clients/clientsModel";
 import { IClients, Status } from "../models/clients/clientsTypes";
 import { CompanyClientModel } from "../models/relations/companyClient/companyClientModel";
 import { hashPassword, comparePassword } from "../services/hashPassword";
-import { generateToken } from "../services/generateToken";
+import { generateToken, Role } from "../services/generateToken";
 
 class ClientsControllers {
   async login(req: Request, res: Response) {
@@ -126,7 +126,7 @@ class ClientsControllers {
           external_id: _id,
           name: client_data.name,
           type:
-            client_data.document.type === "cpf" ? "individual" : "corporations",
+            client_data.document.type === "cpf" ? "individual" : "corporation",
           country: client_data.address.country,
           email: client_data.email,
           documents: [
@@ -193,11 +193,21 @@ class ClientsControllers {
       await session.commitTransaction();
       session.endSession();
 
+      const role = (client
+        ? client.role
+        : newClient && newClient.role) as unknown as Role;
+
+      const token: string = generateToken({
+        id: client?.id ?? newClient?.id,
+        role,
+      });
+
       if (client && verifyRelationship) {
         message = "Cliente já cadastrado";
         throw new Error(message);
       } else {
         res.status(201).send({
+          token,
           client: client ?? newClient,
           message: "Cliente criado com sucesso",
         });

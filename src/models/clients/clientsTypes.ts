@@ -1,4 +1,5 @@
 import { Document, Model } from "mongoose";
+import { Role } from "../../services/generateToken";
 
 export enum Gender {
   MASCULINO = "MASCULINO",
@@ -23,6 +24,7 @@ export type IAddress = {
   number: string;
   street: string;
 };
+
 export type IClients = {
   name: string;
   email: string;
@@ -34,6 +36,7 @@ export type IClients = {
   status: Status;
   document: IDocument;
   address: IAddress;
+  role: Role;
   customer_id?: string;
   created_at?: Date;
   updated_at?: Date;

@@ -1,4 +1,5 @@
 import { Document, Model } from "mongoose";
+import { Role } from "../../services/generateToken";
 
 export type IAddress = {
   country: string;
@@ -47,6 +48,7 @@ export interface ICompanies {
   geolocation: IGeolocation;
   bank_account: IBankAccount;
   status: Status;
+  role: Role;
   recipient_id?: string;
   created_at: Date;
   updated_at: Date;

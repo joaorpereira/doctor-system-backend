@@ -70,8 +70,9 @@ const ClientsSchema = new Schema({
   },
   role: {
     type: String,
-    DEFAULT: "CLIENT",
+    enum: ["ADMIN", "COMPANY", "CLIENT", "WORKER"],
     required: true,
+    default: "CLIENT",
   },
   customer_id: String,
   created_at: {

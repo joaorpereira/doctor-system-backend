@@ -96,9 +96,9 @@ const CompaniesSchema = new Schema({
   },
   role: {
     type: String,
-    enum: ["ADMIN", "COMPANY"],
-    DEFAULT: "COMPANY",
+    enum: ["ADMIN", "COMPANY", "CLIENT", "WORKER"],
     required: true,
+    default: "COMPANY",
   },
   recipient_id: {
     type: String,

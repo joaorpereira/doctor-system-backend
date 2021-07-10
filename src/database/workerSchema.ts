@@ -77,8 +77,9 @@ const WorkersSchema = new Schema({
   },
   role: {
     type: String,
-    DEFAULT: "WORKER",
+    enum: ["ADMIN", "COMPANY", "CLIENT", "WORKER"],
     required: true,
+    default: "WORKER",
   },
   services: [
     {

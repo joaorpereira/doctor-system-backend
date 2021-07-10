@@ -1,8 +1,12 @@
 import * as jwt from "jsonwebtoken";
 
+export type Role = {
+  role: "ADMIN" | "COMPANY" | "CLIENT" | "WORKER";
+};
+
 export type AuthToken = {
   id: string;
-  role: "ADMIN" | "COMPANY" | "CLIENT" | "WORKER";
+  role: Role;
 };
 
 export const generateToken = (payload: AuthToken): string => {

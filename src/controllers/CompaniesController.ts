@@ -3,9 +3,9 @@ import { Request, Response } from "express";
 import { CompaniesModel } from "../models/companies/companiesModel";
 import { getDistance } from "../services/distance";
 import { pagarmeService } from "../services/pargar-me";
-import { Status } from "../models/companies/companiesTypes";
+import { ICompanies, Status } from "../models/companies/companiesTypes";
 import { hashPassword, comparePassword } from "../services/hashPassword";
-import { generateToken } from "../services/generateToken";
+import { generateToken, Role } from "../services/generateToken";
 
 class CompaniesController {
   async login(req: Request, res: Response) {
@@ -20,9 +20,11 @@ class CompaniesController {
         message = "Email e senha são campos obrigatórios";
         throw new Error(message);
       }
-      const company: any = await CompaniesModel.findOne({
+      const company = await CompaniesModel.findOne({
         email,
-      });
+      }).select(
+        "name email _id picture background role bank_account geolocation address"
+      );
 
       if (!company) {
         statusCode = 404;
@@ -40,12 +42,12 @@ class CompaniesController {
 
       const token: string = generateToken({
         id: company.id,
-        role: company.role,
+        role: company.role as Role,
       });
 
       res
         .status(200)
-        .send({ token, company, message: "Usuário logado com sucesso" });
+        .send({ token, user: company, message: "Usuário logado com sucesso" });
     } catch (error) {
       res.status(statusCode).send({
         message,
@@ -126,10 +128,10 @@ class CompaniesController {
     session.startTransaction();
 
     let message = "Erro ao criar empresa";
-    let newCompany = null;
+    let newCompany = {} as ICompanies;
 
     try {
-      const companyData = req.body;
+      const companyData: ICompanies = req.body;
 
       const company = await CompaniesModel.findOne({
         $or: [{ email: companyData.email }],
@@ -194,17 +196,17 @@ class CompaniesController {
         company: newCompany,
         message: "Empresa criada com sucesso",
       });
-    } catch (error: any) {
+    } catch (error) {
       await session.abortTransaction();
       session.endSession();
-      res.status(404).send({ message });
+      res.status(404).send({ message, error: error.message });
     }
   }
 
   async update(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const data = req.body;
+      const data: ICompanies = req.body;
 
       const hashedPassword = await hashPassword(data.password);
 

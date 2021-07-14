@@ -28,7 +28,7 @@ class WorkersController {
       }
       const worker: any = await WorkersModel.findOne({
         email,
-      });
+      }).select("name email _id picture role bank_account address");
 
       if (!worker) {
         statusCode = 404;
@@ -49,9 +49,11 @@ class WorkersController {
         role: worker.role,
       });
 
-      res
-        .status(200)
-        .send({ token, worker, message: "Colaborador logado com sucesso" });
+      res.status(200).send({
+        token,
+        user: worker,
+        message: "Colaborador logado com sucesso",
+      });
     } catch (error) {
       res.status(statusCode).send({
         message,
@@ -106,6 +108,8 @@ class WorkersController {
       });
 
       let newWorker = null;
+
+      console.log(worker);
 
       if (!worker && worker_data) {
         const { bank_account } = worker_data;
@@ -205,12 +209,12 @@ class WorkersController {
       if (worker && verifyRelationship) {
         message = "Colaborador já cadastrado";
         throw new Error(message);
-      } else {
-        res.status(201).send({
-          worker: worker ?? newWorker,
-          message: "Colaborador criado com sucesso",
-        });
       }
+
+      res.status(201).send({
+        worker: worker ?? newWorker,
+        message: "Colaborador criado com sucesso",
+      });
     } catch (error) {
       await session.abortTransaction();
       session.endSession();

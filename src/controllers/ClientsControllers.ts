@@ -2,7 +2,11 @@ import mongoose from "mongoose";
 import { Request, Response } from "express";
 import { pagarmeService } from "../services/pargar-me";
 import { ClientsModel } from "../models/clients/clientsModel";
-import { IClients, Status } from "../models/clients/clientsTypes";
+import {
+  IClients,
+  IClientsDocument,
+  Status,
+} from "../models/clients/clientsTypes";
 import { CompanyClientModel } from "../models/relations/companyClient/companyClientModel";
 import { hashPassword, comparePassword } from "../services/hashPassword";
 import { generateToken, Role } from "../services/generateToken";
@@ -20,9 +24,9 @@ class ClientsControllers {
         message = "Email e senha são campos obrigatórios";
         throw new Error(message);
       }
-      const client: any = await ClientsModel.findOne({
+      const client = await ClientsModel.findOne({
         email,
-      });
+      }).select("name email _id picture role phone_number address");
 
       if (!client) {
         statusCode = 404;
@@ -40,12 +44,12 @@ class ClientsControllers {
 
       const token: string = generateToken({
         id: client.id,
-        role: client.role,
+        role: client.role as Role,
       });
 
       res
         .status(200)
-        .send({ token, client, message: "Usuário logado com sucesso" });
+        .send({ token, user: client, message: "Usuário logado com sucesso" });
     } catch (error) {
       res.status(statusCode).send({
         message,
@@ -117,7 +121,7 @@ class ClientsControllers {
         ],
       });
 
-      let newClient = null;
+      let newClient = {} as IClientsDocument;
 
       if (!client) {
         const _id = mongoose.Types.ObjectId();
@@ -205,13 +209,13 @@ class ClientsControllers {
       if (client && verifyRelationship) {
         message = "Cliente já cadastrado";
         throw new Error(message);
-      } else {
-        res.status(201).send({
-          token,
-          client: client ?? newClient,
-          message: "Cliente criado com sucesso",
-        });
       }
+
+      res.status(201).send({
+        token,
+        client: client ?? newClient,
+        message: "Cliente criado com sucesso",
+      });
     } catch (error) {
       await session.abortTransaction();
       session.endSession();
@@ -221,7 +225,7 @@ class ClientsControllers {
 
   async update(req: Request, res: Response) {
     const { id } = req.params;
-    const data = req.body;
+    const data: IClientsDocument = req.body;
 
     const hashedPassword = await hashPassword(data.password);
 

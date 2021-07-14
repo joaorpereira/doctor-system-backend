@@ -37,7 +37,8 @@ export type IBankAccount = {
   cpf_or_cnpj: string;
   acc_number: string;
 };
-export interface ICompanies {
+
+export type ICompanies = {
   name: string;
   email: string;
   password: string;
@@ -47,12 +48,12 @@ export interface ICompanies {
   address: IAddress;
   geolocation: IGeolocation;
   bank_account: IBankAccount;
-  status: Status;
-  role: Role;
+  status?: Status;
+  role?: Role;
   recipient_id?: string;
-  created_at: Date;
-  updated_at: Date;
-}
+  created_at?: Date;
+  updated_at?: Date;
+};
 
 export interface ICompaniesDocument extends ICompanies, Document {
   geolocation: IGeolocation;

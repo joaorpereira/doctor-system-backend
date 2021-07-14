@@ -34,7 +34,8 @@
     "class-methods-use-this": "off",
     "no-underscore-dangle": "off",
     "no-plusplus": "off",
-    "import/no-unresolved": [2, { "caseSensitive": false }]
+    "import/no-unresolved": [2, { "caseSensitive": false }],
+    "prefer-const": "off"
   },
   "settings": {
     "import/resolver": {

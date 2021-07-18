@@ -240,10 +240,8 @@ class ServicesController {
     try {
       const { id, status } = req.params;
 
-      const newStatus: Status = status as Status;
-
       const service = await ServicesModel.findByIdAndUpdate(id, {
-        status: Status[newStatus],
+        status: status as Status,
       });
 
       if (!service) {
@@ -251,8 +249,8 @@ class ServicesController {
       }
 
       res.status(200).send({
-        services: service,
-        message: `Status do serviço atualizado com sucesso. Novo status: ${newStatus}`,
+        service,
+        message: `Status do serviço atualizado com sucesso. Novo status: ${status}`,
       });
     } catch (error) {
       res

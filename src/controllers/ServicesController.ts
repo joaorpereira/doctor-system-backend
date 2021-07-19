@@ -29,7 +29,7 @@ class ServicesController {
         const files = await FilesModel.find({
           model: "Services",
           reference_id: service._id,
-        });
+        }).select("-model -created_at -updated_at -__v");
         newServices.push({
           ...service._doc,
           files,
@@ -37,7 +37,7 @@ class ServicesController {
       }
 
       res.status(200).send({
-        services: newServices,
+        data: newServices,
       });
     } catch (error) {
       res.status(404).send({
@@ -63,7 +63,7 @@ class ServicesController {
       }));
 
       res.status(200).send({
-        services: newServices,
+        data: newServices,
       });
     } catch (error) {
       res.status(404).send({
@@ -137,7 +137,7 @@ class ServicesController {
         }
 
         res.status(201).send({
-          service: { ...newService._doc, files: newFiles },
+          data: { ...newService._doc, files: newFiles },
           message: "Serviço criado com sucesso",
         });
       });
@@ -163,7 +163,7 @@ class ServicesController {
     }
 
     const errors: IErrorAWS[] = [];
-    const files: string[] = [];
+    const inputFiles: string[] = [];
     const busboy = new Busboy({ headers: req.headers });
 
     try {
@@ -189,13 +189,8 @@ class ServicesController {
             const response = (await uploadToS3({ file, path })) as any;
             if (response.error) {
               errors.push({ error: response.error });
-            } else files.push(path);
+            } else inputFiles.push(path);
           }
-        } else {
-          // deletar tambem do bucket
-          await FilesModel.deleteMany({
-            reference_id: id,
-          });
         }
 
         if (errors.length > 0) {
@@ -203,15 +198,18 @@ class ServicesController {
         }
 
         const newService = await ServicesModel.findByIdAndUpdate(
-          id,
-          jsonService
-        );
+          { _id: id },
+          jsonService,
+          {
+            returnOriginal: false,
+          }
+        ).select(" -updated_at -__v");
 
         if (!newService) {
           throw new Error("Serviço não encontrado");
         }
 
-        const newFiles = files.map((file) => ({
+        const newFiles = inputFiles.map((file) => ({
           reference_id: id,
           model: "Services",
           folder: file,
@@ -222,8 +220,12 @@ class ServicesController {
           await FilesModel.insertMany(newFiles);
         }
 
+        const files = await FilesModel.find({ reference_id: id }).select(
+          "-model -created_at -updated_at -__v"
+        );
+
         res.status(200).send({
-          service: { ...newService, files: newFiles },
+          data: { ...newService._doc, files },
           message: "Serviço atualizado com sucesso",
         });
       });
@@ -249,7 +251,7 @@ class ServicesController {
       }
 
       res.status(200).send({
-        service,
+        data: service,
         message: `Status do serviço atualizado com sucesso. Novo status: ${status}`,
       });
     } catch (error) {

@@ -65,7 +65,7 @@ class WorkersController {
   async getAllWorkers(req: Request, res: Response) {
     try {
       const workers = await WorkersModel.find().select(" -updated_at -__v");
-      res.status(200).send({ workers });
+      res.status(200).send({ data: workers });
     } catch (error) {
       res
         .status(404)
@@ -81,7 +81,7 @@ class WorkersController {
         " -updated_at -__v"
       );
 
-      res.status(200).send({ worker });
+      res.status(200).send({ data: worker });
     } catch (error) {
       res.status(404).send({ message: "Colaborador não encontrado", error });
     }
@@ -108,8 +108,6 @@ class WorkersController {
       });
 
       let newWorker = null;
-
-      console.log(worker);
 
       if (!worker && worker_data) {
         const { bank_account } = worker_data;
@@ -212,7 +210,7 @@ class WorkersController {
       }
 
       res.status(201).send({
-        worker: worker ?? newWorker,
+        data: worker ?? newWorker,
         message: "Colaborador criado com sucesso",
       });
     } catch (error) {
@@ -244,7 +242,7 @@ class WorkersController {
 
       res
         .status(200)
-        .send({ worker, message: "Colaborador alterado com sucesso" });
+        .send({ data: worker, message: "Colaborador alterado com sucesso" });
     } catch (error) {
       res
         .status(404)
@@ -298,7 +296,7 @@ class WorkersController {
         })
       );
 
-      res.status(200).send({ lifOfWorkers });
+      res.status(200).send({ data: lifOfWorkers });
     } catch (error) {
       res.status(404).send({
         message: "Lista de colaboradores não encontrada",

@@ -266,37 +266,22 @@ class WorkersController {
   async listWorkersByCompany(req: Request, res: Response) {
     try {
       const { company_id } = req.params;
-      let newListOfWorkers: any = [];
 
       const listWorkersByCompany = await CompanyWorkerModel.find({
         company_id,
         status: { $ne: Status.REMOVIDO },
       })
-        .populate({ path: "worker_id", select: "-password -recipient_id" })
+        .populate({
+          path: "worker_id",
+          select: "-password -recipient_id -created_at",
+        })
         .select("worker_id created_at status");
 
-      // eslint-disable-next-line no-restricted-syntax
-      for (const worker of listWorkersByCompany) {
-        const workerDoc = worker._doc;
-        const workerData: IWorkerData = worker.worker_id as any;
-        // eslint-disable-next-line no-await-in-loop
-        const workerServices = await WorkerServiceModel.find({
-          worker_id: workerData._id,
-        });
-        newListOfWorkers = [{ ...workerDoc, workerServices }];
-      }
+      const list = listWorkersByCompany.map((worker) => worker.worker_id);
 
-      const lifOfWorkers: ICompanyWorkers = newListOfWorkers.map(
-        (item: any) => ({
-          _id: item._id,
-          status: item.status,
-          worker: item.worker_id,
-          services: item.workerServices,
-          created_at: item.created_at,
-        })
-      );
-
-      res.status(200).send({ data: lifOfWorkers });
+      res.status(200).send({
+        data: list,
+      });
     } catch (error) {
       res.status(404).send({
         message: "Lista de colaboradores não encontrada",

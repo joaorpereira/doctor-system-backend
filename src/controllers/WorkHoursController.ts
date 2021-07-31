@@ -16,7 +16,7 @@ class WorkHoursController {
       const company_work_hours = await WorkHoursModel.find({
         company_id: id,
       }).select(" -updated_at -__v");
-      res.status(201).send({ company_work_hours });
+      res.status(200).send({ data: company_work_hours });
     } catch (error) {
       res.status(404).send({
         message: "Erro ao buscar os horários do salão",
@@ -45,7 +45,7 @@ class WorkHoursController {
         value: worker.worker_id._id,
       }));
 
-      res.status(200).send({ listOfWorkers });
+      res.status(200).send({ data: listOfWorkers });
     } catch (error) {
       res
         .status(404)
@@ -57,11 +57,14 @@ class WorkHoursController {
     try {
       const data = req.body;
       const work_hours: IWorkHours = await new WorkHoursModel(data).save();
-      res.status(201).send({ work_hours });
-    } catch (error) {
       res
-        .status(404)
-        .send({ message: "Erro ao criar novo horário", error: error.message });
+        .status(201)
+        .send({ data: work_hours, message: "Horário criado com sucesso" });
+    } catch (error) {
+      res.status(404).send({
+        message: "Erro ao criar novo horário",
+        error: error.message,
+      });
     }
   }
 
@@ -89,7 +92,7 @@ class WorkHoursController {
 
       res
         .status(200)
-        .send({ work_hours, message: "Horário alterado com sucesso" });
+        .send({ data: work_hours, message: "Horário alterado com sucesso" });
     } catch (error) {
       res.status(404).send({
         message: "Não foi possível alterar o horário",

@@ -59,10 +59,13 @@ class CompaniesController {
   async getCompanyList(req: Request, res: Response) {
     try {
       const companies = await CompaniesModel.find().select(" -updated_at -__v");
-      res.status(200).send({ companies });
+      res.status(200).send({
+        data: companies,
+        message: "Lista de empresas obtida com sucesso",
+      });
     } catch (error) {
       res.status(404).send({
-        message: "Lista de clientes não encontrada",
+        message: "Lista de empresas não encontrada",
         error: error.message,
       });
     }
@@ -91,11 +94,15 @@ class CompaniesController {
 
       distance = parseFloat(distance.toFixed(1));
 
-      res.status(200).send({ company, distance });
+      res.status(200).send({
+        data: { company, distance },
+        message: "Distância entre cliente e empresa obtida com sucesso",
+      });
     } catch (error) {
-      res
-        .status(404)
-        .send({ message: "Empresa não localizada", error: error.message });
+      res.status(404).send({
+        message: "Erro ao obter a distância entre cliente e empresa",
+        error: error.message,
+      });
     }
   }
 
@@ -112,7 +119,8 @@ class CompaniesController {
       }));
 
       res.status(200).send({
-        companies: newCompanies,
+        data: newCompanies,
+        message: "Lista de empresas filtrada obtida com sucesso",
       });
     } catch (error) {
       res.status(404).send({
@@ -193,7 +201,7 @@ class CompaniesController {
       session.endSession();
 
       res.status(201).send({
-        company: newCompany,
+        data: newCompany,
         message: "Empresa criada com sucesso",
       });
     } catch (error) {
@@ -231,7 +239,7 @@ class CompaniesController {
 
       res
         .status(200)
-        .send({ company, message: "Empresa alterada com sucesso" });
+        .send({ data: company, message: "Empresa alterada com sucesso" });
     } catch (error) {
       res.status(404).send({
         message: "Erro ao alterar dados da empresa",

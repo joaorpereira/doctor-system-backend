@@ -61,7 +61,7 @@ class ClientsControllers {
   async getAllClients(req: Request, res: Response) {
     try {
       const clients = await ClientsModel.find().select(" -updated_at -__v");
-      res.status(200).send({ clients });
+      res.status(200).send({ data: clients });
     } catch (error) {
       res.status(404).send({
         message: "Lista de clientes não encontrada",
@@ -77,7 +77,7 @@ class ClientsControllers {
         " -updated_at -__v"
       );
 
-      res.status(200).send({ client });
+      res.status(200).send({ data: client });
     } catch (error) {
       res
         .status(404)
@@ -94,7 +94,7 @@ class ClientsControllers {
 
       res
         .status(200)
-        .send({ clients, message: "Lista de clientes encontrada" });
+        .send({ data: clients, message: "Lista de clientes encontrada" });
     } catch (error) {
       res
         .status(404)
@@ -213,7 +213,7 @@ class ClientsControllers {
 
       res.status(201).send({
         token,
-        client: client ?? newClient,
+        data: client ?? newClient,
         message: "Cliente criado com sucesso",
       });
     } catch (error) {
@@ -247,7 +247,9 @@ class ClientsControllers {
         throw new Error("Dados do cliente não foram encontrados");
       }
 
-      res.status(200).send({ message: "Cliente alterado com sucesso", client });
+      res
+        .status(200)
+        .send({ data: client, message: "Cliente alterado com sucesso" });
     } catch (error) {
       res.status(404).send({
         message: "Erro ao alterar dados do cliente",

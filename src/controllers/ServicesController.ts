@@ -242,9 +242,15 @@ class ServicesController {
     try {
       const { id, status } = req.params;
 
-      const service = await ServicesModel.findByIdAndUpdate(id, {
-        status: status as Status,
-      });
+      const service = await ServicesModel.findByIdAndUpdate(
+        id,
+        {
+          status: status as Status,
+        },
+        {
+          returnOriginal: false,
+        }
+      ).select("-model -created_at -updated_at -__v");
 
       if (!service) {
         throw new Error("Serviço não encontrado");

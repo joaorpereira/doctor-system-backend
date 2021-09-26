@@ -39,6 +39,7 @@ export type IBankAccount = {
 };
 
 export type ICompanies = {
+  _id?: string;
   name: string;
   email: string;
   password: string;
@@ -56,6 +57,7 @@ export type ICompanies = {
 };
 
 export interface ICompaniesDocument extends ICompanies, Document {
+  _id?: string;
   geolocation: IGeolocation;
 }
 

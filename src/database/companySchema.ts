@@ -45,6 +45,7 @@ const CompaniesSchema = new Schema({
   geolocation: {
     type: {
       type: String,
+      default: "Point",
     },
     coordinates: {
       type: [Number],

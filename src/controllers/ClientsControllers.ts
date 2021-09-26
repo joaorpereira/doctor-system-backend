@@ -60,7 +60,9 @@ class ClientsControllers {
 
   async getAllClients(req: Request, res: Response) {
     try {
-      const clients = await ClientsModel.find().select(" -updated_at -__v");
+      const clients = await ClientsModel.find().select(
+        " -updated_at -__v -password"
+      );
       res.status(200).send({ data: clients });
     } catch (error) {
       res.status(404).send({
@@ -74,7 +76,7 @@ class ClientsControllers {
     try {
       const { id } = req.params;
       const client = await ClientsModel.findById(id).select(
-        " -updated_at -__v"
+        " -updated_at -__v -password"
       );
 
       res.status(200).send({ data: client });
@@ -89,7 +91,7 @@ class ClientsControllers {
     try {
       const { filters } = req.body;
       const clients = await ClientsModel.find(filters).select(
-        " -updated_at -__v"
+        " -updated_at -__v -password"
       );
 
       res
@@ -211,9 +213,24 @@ class ClientsControllers {
         throw new Error(message);
       }
 
+      const clientData = {
+        status: client?.status ?? newClient?.status,
+        role: client?.role ?? newClient?.role,
+        _id: client?._id ?? newClient?._id,
+        name: client?.name ?? newClient?.name,
+        email: client?.email ?? newClient?.email,
+        picture: client?.picture ?? newClient?.picture,
+        phone_number: client?.phone_number ?? newClient?.phone_number,
+        gender: client?.gender ?? newClient?.gender,
+        birth_date: client?.birth_date ?? newClient?.birth_date,
+        document: client?.document ?? newClient?.document,
+        address: client?.address ?? newClient?.address,
+        customer_id: client?.customer_id ?? newClient?.customer_id,
+      };
+
       res.status(201).send({
         token,
-        data: client ?? newClient,
+        data: clientData,
         message: "Cliente criado com sucesso",
       });
     } catch (error) {
@@ -227,29 +244,43 @@ class ClientsControllers {
     const { id } = req.params;
     const data: IClientsDocument = req.body;
 
-    const hashedPassword = await hashPassword(data.password);
+    const client = await ClientsModel.findById(id).select(
+      " -updated_at -__v -password -bank_account"
+    );
+
+    const { name, email, password, picture, phone_number, address } = data;
+
+    let hashedPassword = password;
+
+    if (password) {
+      hashedPassword = await hashPassword(password);
+    }
 
     try {
       const update = {
-        name: data.name,
-        email: data.email,
-        password: hashedPassword,
-        picture: data.picture,
-        phone_number: data.phone_number,
-        address: data.address,
+        name: name ?? client?.name,
+        email: email ?? client?.email,
+        password: hashedPassword ?? client?.password,
+        picture: picture ?? client?.picture,
+        phone_number: phone_number ?? client?.phone_number,
+        address: address ?? client?.address,
       };
 
-      const client = await ClientsModel.findOneAndUpdate({ _id: id }, update, {
-        returnOriginal: false,
-      }).select(" -updated_at -__v -customer_id");
+      const newClient = await ClientsModel.findOneAndUpdate(
+        { _id: id },
+        update,
+        {
+          returnOriginal: false,
+        }
+      ).select(" -updated_at -__v -customer_id -password");
 
-      if (!client) {
+      if (!newClient) {
         throw new Error("Dados do cliente não foram encontrados");
       }
 
       res
         .status(200)
-        .send({ data: client, message: "Cliente alterado com sucesso" });
+        .send({ data: newClient, message: "Cliente alterado com sucesso" });
     } catch (error) {
       res.status(404).send({
         message: "Erro ao alterar dados do cliente",

@@ -23,7 +23,7 @@ class CompaniesController {
       const company = await CompaniesModel.findOne({
         email,
       }).select(
-        "name email _id picture background role bank_account geolocation address"
+        "name email _id password picture background role bank_account geolocation address"
       );
 
       if (!company) {
@@ -45,10 +45,24 @@ class CompaniesController {
         role: company.role as Role,
       });
 
-      res
-        .status(200)
-        .send({ token, user: company, message: "Usuário logado com sucesso" });
-    } catch (error) {
+      const user = {
+        name: company.name,
+        email: company.email,
+        _id: company._id,
+        picture: company.picture,
+        background: company.background,
+        role: company.role,
+        bank_account: company.bank_account,
+        geolocation: company.geolocation,
+        address: company.address,
+      };
+
+      res.status(200).send({
+        token,
+        message: "Usuário logado com sucesso",
+        user,
+      });
+    } catch (error: any) {
       res.status(statusCode).send({
         message,
         error: error.message,
@@ -58,7 +72,10 @@ class CompaniesController {
 
   async getCompanyList(req: Request, res: Response) {
     try {
-      const companies = await CompaniesModel.find().select(" -updated_at -__v");
+      const companies = await CompaniesModel.find().select(
+        " -updated_at -__v -password -bank_account"
+      );
+
       res.status(200).send({
         data: companies,
         message: "Lista de empresas obtida com sucesso",
@@ -76,7 +93,7 @@ class CompaniesController {
       const { id, lat: user_lat, lon: user_lon } = req.params;
 
       const company = await CompaniesModel.findById(id).select(
-        " -updated_at -__v"
+        " -updated_at -__v -password -bank_account"
       );
       let distance = 0;
 
@@ -200,8 +217,24 @@ class CompaniesController {
       await session.commitTransaction();
       session.endSession();
 
+      const data = {
+        _id: newCompany._id,
+        name: newCompany.name,
+        geolocation: newCompany.geolocation,
+        status: newCompany.status,
+        role: newCompany.role,
+        created_at: newCompany.created_at,
+        email: newCompany.email,
+        picture: newCompany.picture,
+        background: newCompany.background,
+        phone_number: newCompany.phone_number,
+        address: newCompany.address,
+        bank_account: newCompany.bank_account,
+        recipient_id: newCompany.recipient_id,
+      };
+
       res.status(201).send({
-        data: newCompany,
+        data,
         message: "Empresa criada com sucesso",
       });
     } catch (error) {
@@ -214,22 +247,35 @@ class CompaniesController {
   async update(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const data: ICompanies = req.body;
+      const {
+        name,
+        password,
+        phone_number,
+        address,
+        picture,
+        background,
+        geolocation,
+        ...rest
+      }: ICompanies = req.body;
 
-      const hashedPassword = await hashPassword(data.password);
+      const company = await CompaniesModel.findById(id).select(
+        " -updated_at -__v -password -bank_account"
+      );
+
+      const hashedPassword = await hashPassword(password);
 
       const update = {
-        ...data,
-        name: data.name,
-        password: hashedPassword,
-        picture: data.picture,
-        background: data.background,
-        phone_number: data.phone_number,
-        geolocation: data.geolocation,
-        address: data.address,
+        ...rest,
+        name: name ?? company?.name,
+        password: hashedPassword ?? company?.password,
+        picture: picture ?? company?.name,
+        background: background ?? company?.background,
+        phone_number: phone_number ?? company?.phone_number,
+        geolocation: geolocation ?? company?.geolocation,
+        address: address ?? company?.address,
       };
 
-      const company = await CompaniesModel.findOneAndUpdate(
+      const newCompany = await CompaniesModel.findOneAndUpdate(
         { _id: id },
         update,
         {
@@ -239,7 +285,7 @@ class CompaniesController {
 
       res
         .status(200)
-        .send({ data: company, message: "Empresa alterada com sucesso" });
+        .send({ data: newCompany, message: "Empresa alterada com sucesso" });
     } catch (error) {
       res.status(404).send({
         message: "Erro ao alterar dados da empresa",

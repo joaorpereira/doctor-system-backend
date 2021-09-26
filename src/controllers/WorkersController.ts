@@ -26,9 +26,9 @@ class WorkersController {
         message = "Email e senha são campos obrigatórios";
         throw new Error(message);
       }
-      const worker: any = await WorkersModel.findOne({
+      const worker = await WorkersModel.findOne({
         email,
-      }).select("name email _id picture role bank_account address");
+      }).select("name email _id password picture role bank_account address");
 
       if (!worker) {
         statusCode = 404;
@@ -45,13 +45,22 @@ class WorkersController {
       }
 
       const token: string = generateToken({
-        id: worker.id,
+        id: worker._id,
         role: worker.role,
       });
 
+      const user = {
+        _id: worker._id,
+        bank_account: worker.bank_account,
+        role: worker.role,
+        name: worker.name,
+        email: worker.email,
+        picture: worker.picture,
+      };
+
       res.status(200).send({
         token,
-        user: worker,
+        user,
         message: "Colaborador logado com sucesso",
       });
     } catch (error) {
@@ -64,7 +73,9 @@ class WorkersController {
 
   async getAllWorkers(req: Request, res: Response) {
     try {
-      const workers = await WorkersModel.find().select(" -updated_at -__v");
+      const workers = await WorkersModel.find().select(
+        " -updated_at -__v -password"
+      );
       res.status(200).send({ data: workers });
     } catch (error) {
       res
@@ -78,7 +89,7 @@ class WorkersController {
       const { id } = req.params;
 
       const worker = await WorkersModel.findById(id).select(
-        " -updated_at -__v"
+        " -updated_at -__v -password"
       );
 
       res.status(200).send({ data: worker });
@@ -209,8 +220,24 @@ class WorkersController {
         throw new Error(message);
       }
 
+      const data = {
+        status: worker?.status ?? newWorker?.status,
+        role: worker?.role ?? newWorker?.role,
+        services: worker?.services ?? newWorker?.services,
+        _id: worker?._id ?? newWorker?._id,
+        name: worker?.name ?? newWorker?.name,
+        email: worker?.email ?? newWorker?.email,
+        picture: worker?.picture ?? newWorker?.picture,
+        phone_number: worker?.phone_number ?? newWorker?.phone_number,
+        gender: worker?.gender ?? newWorker?.gender,
+        birth_date: worker?.birth_date ?? newWorker?.birth_date,
+        document: worker?.document ?? newWorker?.document,
+        bank_account: worker?.bank_account ?? newWorker?.bank_account,
+        recipient_id: worker?.recipient_id ?? newWorker?.recipient_id,
+      };
+
       res.status(201).send({
-        data: worker ?? newWorker,
+        data,
         message: "Colaborador criado com sucesso",
       });
     } catch (error) {
@@ -222,27 +249,39 @@ class WorkersController {
 
   async update(req: Request, res: Response) {
     const { id } = req.params;
-    const data = req.body;
+    const { name, email, password, picture, services, phone_number } = req.body;
 
-    const hashedPassword = await hashPassword(data.password);
+    let hashedPassword = password;
+
+    if (password) {
+      hashedPassword = await hashPassword(password);
+    }
+
+    const worker = await WorkersModel.findById(id).select(
+      " -updated_at -__v -password -bank_account"
+    );
 
     try {
       const update = {
-        name: data.name,
-        email: data.email,
-        password: hashedPassword,
-        picture: data.picture,
-        services: data.services,
-        phone_number: data.phone_number,
+        name: name ?? worker?.name,
+        email: email ?? worker?.email,
+        password: hashedPassword ?? worker?.password,
+        picture: picture ?? worker?.picture,
+        services: services ?? worker?.services,
+        phone_number: phone_number ?? worker?.phone_number,
       };
 
-      const worker = await WorkersModel.findOneAndUpdate({ _id: id }, update, {
-        returnOriginal: false,
-      }).select(" -updated_at -__v");
+      const newWorker = await WorkersModel.findOneAndUpdate(
+        { _id: id },
+        update,
+        {
+          returnOriginal: false,
+        }
+      ).select(" -updated_at -__v -password");
 
       res
         .status(200)
-        .send({ data: worker, message: "Colaborador alterado com sucesso" });
+        .send({ data: newWorker, message: "Colaborador alterado com sucesso" });
     } catch (error) {
       res
         .status(404)
@@ -273,7 +312,7 @@ class WorkersController {
       })
         .populate({
           path: "worker_id",
-          select: "-password -recipient_id -created_at",
+          select: "-password -recipient_id -created_at -__v",
         })
         .select("worker_id created_at status");
 

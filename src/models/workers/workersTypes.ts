@@ -34,6 +34,7 @@ export type IBankAccount = {
 };
 
 export type IWorkers = {
+  _id?: string;
   services?: string[];
   name: string;
   email: string;
@@ -51,6 +52,8 @@ export type IWorkers = {
   updated_at?: Date;
 };
 
-export interface IWorkersDocument extends IWorkers, Document {}
+export interface IWorkersDocument extends IWorkers, Document {
+  _id: string;
+}
 
 export type IWorkersModel = Model<IWorkersDocument>;

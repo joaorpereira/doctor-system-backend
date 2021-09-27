@@ -9,14 +9,29 @@ type ListOfWorkers = {
   label: string;
   value: string;
 };
+
 class WorkHoursController {
+  async getAll(req: Request, res: Response) {
+    try {
+      const companyWorkHours = await WorkHoursModel.find().select(
+        " -updated_at -__v"
+      );
+      res.status(200).send({ data: companyWorkHours });
+    } catch (error) {
+      res.status(404).send({
+        message: "Erro ao buscar os horários do salão",
+        error: error.message,
+      });
+    }
+  }
+
   async getWorkHoursByCompany(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const company_work_hours = await WorkHoursModel.find({
+      const companyWorkHours = await WorkHoursModel.find({
         company_id: id,
       }).select(" -updated_at -__v");
-      res.status(200).send({ data: company_work_hours });
+      res.status(200).send({ data: companyWorkHours });
     } catch (error) {
       res.status(404).send({
         message: "Erro ao buscar os horários do salão",
@@ -39,11 +54,13 @@ class WorkHoursController {
       const listOfWorkers: ListOfWorkers[] = _.unionBy(
         servicesByWorkers,
         // eslint-disable-next-line no-underscore-dangle
-        (worker: any) => worker.worker_id._id.toString()
-      ).map((worker: any) => ({
-        label: worker.worker_id.name,
-        value: worker.worker_id._id,
-      }));
+        (worker: any) => worker?.worker_id?._id.toString()
+      )
+        .map((worker: any) => ({
+          label: worker?.worker_id?.name,
+          value: worker?.worker_id?._id,
+        }))
+        .filter((value) => JSON.stringify(value) !== "{}");
 
       res.status(200).send({ data: listOfWorkers });
     } catch (error) {
@@ -56,10 +73,19 @@ class WorkHoursController {
   async create(req: Request, res: Response) {
     try {
       const data = req.body;
-      const work_hours: IWorkHours = await new WorkHoursModel(data).save();
+      const workHours: IWorkHours = await new WorkHoursModel(data).save();
+      const newWorkHours = {
+        _id: workHours?._id,
+        services: workHours?.services,
+        workers: workHours?.workers,
+        days: workHours?.days,
+        company_id: workHours?.company_id,
+        start_time: workHours?.start_time,
+        end_time: workHours?.end_time,
+      };
       res
         .status(201)
-        .send({ data: work_hours, message: "Horário criado com sucesso" });
+        .send({ data: newWorkHours, message: "Horário criado com sucesso" });
     } catch (error) {
       res.status(404).send({
         message: "Erro ao criar novo horário",
@@ -73,16 +99,22 @@ class WorkHoursController {
       const { id } = req.params;
       const data: IWorkHoursBody = req.body;
 
+      const workHours = await WorkHoursModel.findById(id).select(
+        " -updated_at -__v -password -bank_account"
+      );
+
+      const { services, workers, days, start_time, end_time, ...rest } = data;
+
       const update = {
-        ...data,
-        services: data.services,
-        workers: data.workers,
-        days: data.days,
-        start_time: data.start_time,
-        end_time: data.end_time,
+        ...rest,
+        services: services ?? workHours?.services,
+        workers: workers ?? workHours?.workers,
+        days: days ?? workHours?.days,
+        start_time: start_time ?? workHours?.start_time,
+        end_time: end_time ?? workHours?.end_time,
       };
 
-      const work_hours = await WorkHoursModel.findOneAndUpdate(
+      const newWorkHours = await WorkHoursModel.findOneAndUpdate(
         { _id: id },
         update,
         {
@@ -92,7 +124,7 @@ class WorkHoursController {
 
       res
         .status(200)
-        .send({ data: work_hours, message: "Horário alterado com sucesso" });
+        .send({ data: newWorkHours, message: "Horário alterado com sucesso" });
     } catch (error) {
       res.status(404).send({
         message: "Não foi possível alterar o horário",
@@ -105,7 +137,6 @@ class WorkHoursController {
     try {
       const { id } = req.params;
       await WorkHoursModel.deleteOne({ _id: id });
-      // await WorkerServiceModel.deleteOne({ _id: id });
       res.status(200).send({ message: "Horário removido com sucesso" });
     } catch (error) {
       res

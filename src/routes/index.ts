@@ -38,6 +38,7 @@ router.put("/worker/:id", WorkersController.update);
 router.delete("/worker/:id", WorkersController.delete);
 
 // === workHours ===
+router.get("/work-hours", WorkHoursController.getAll);
 router.post("/work-hours", WorkHoursController.create);
 router.post("/work-hours/service", WorkHoursController.getWorkerHoursByService);
 router.get("/work-hours/:id", WorkHoursController.getWorkHoursByCompany);

@@ -1,6 +1,7 @@
 import { Document, Model } from "mongoose";
 
 export type IWorkHours = {
+  _id?: string;
   company_id: string;
   services: string[];
   workers: string[];
@@ -21,6 +22,8 @@ export type IWorkHoursBody = {
   updated_at?: Date;
 };
 
-export interface IWorkHoursDocument extends IWorkHours, Document {}
+export interface IWorkHoursDocument extends IWorkHours, Document {
+  _id?: string;
+}
 
 export type IWorkHoursModel = Model<IWorkHoursDocument>;

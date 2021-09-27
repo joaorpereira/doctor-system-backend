@@ -1,6 +1,6 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-restricted-syntax */
-import mongoose, { ObjectId } from "mongoose";
+import mongoose, { Error, ObjectId } from "mongoose";
 import dotenv from "dotenv";
 import { Request, Response } from "express";
 
@@ -236,13 +236,15 @@ class ScheduleController {
           $gte: range?.start,
           $lte: range?.end,
         },
-      }).populate([
-        { path: "service_id", select: "title service_duration" },
-        { path: "worker_id", select: "name" },
-        { path: "client_id", select: "name" },
-      ]);
+      })
+        .populate([
+          { path: "service_id", select: "title service_duration" },
+          { path: "worker_id", select: "name" },
+          { path: "client_id", select: "name" },
+        ])
+        .select("-__v");
 
-      res.status(200).send({ schedules });
+      res.status(200).send({ data: schedules });
     } catch (error) {
       res
         .status(404)
@@ -373,7 +375,20 @@ class ScheduleController {
       await session.commitTransaction();
       session.endSession();
 
-      res.status(201).send({ schedule, message: "Horário criado com sucesso" });
+      const newSchedule = {
+        _id: schedule._id,
+        company_id: schedule?.company_id,
+        client_id: schedule?.client_id,
+        worker_id: schedule?.worker_id,
+        service_id: schedule?.service_id,
+        schedule_date: schedule?.schedule_date,
+        price: schedule?.price,
+        transaction_id: schedule?.transaction_id,
+      };
+
+      res
+        .status(201)
+        .send({ data: newSchedule, message: "Horário criado com sucesso" });
     } catch (error) {
       await session.abortTransaction();
       session.endSession();

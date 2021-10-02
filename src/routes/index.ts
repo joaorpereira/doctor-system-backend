@@ -27,6 +27,7 @@ router.delete("/service/:id/:status", ServicesController.removeInactiveService);
 
 // === files ===
 router.post("/file", FilesController.delete);
+router.post("/file/upload", FilesController.upload);
 
 // === worker ===
 router.post("/worker/login", WorkersController.login);

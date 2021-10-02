@@ -45,6 +45,11 @@ type ISlot = {
   services: string[];
 };
 
+type ErrorProps = {
+  message?: string;
+  statusCode?: number;
+};
+
 class ScheduleController {
   async getScheduleDisponibility(req: Request, res: Response) {
     try {
@@ -220,9 +225,10 @@ class ScheduleController {
 
       res.status(200).send({ workerList, schedule });
     } catch (error) {
+      const newError = error as unknown as ErrorProps;
       res
         .status(404)
-        .send({ message: "Erro ao criar horário", error: error.message });
+        .send({ message: "Erro ao criar horário", error: newError.message });
     }
   }
 
@@ -246,9 +252,10 @@ class ScheduleController {
 
       res.status(200).send({ data: schedules });
     } catch (error) {
+      const newError = error as unknown as ErrorProps;
       res
         .status(404)
-        .send({ message: "Erro ao filtrar horário", error: error.message });
+        .send({ message: "Erro ao filtrar horário", error: newError.message });
     }
   }
 
@@ -390,11 +397,12 @@ class ScheduleController {
         .status(201)
         .send({ data: newSchedule, message: "Horário criado com sucesso" });
     } catch (error) {
+      const newError = error as unknown as ErrorProps;
       await session.abortTransaction();
       session.endSession();
       res
         .status(404)
-        .send({ message: "Erro ao criar horário", error: error.message });
+        .send({ message: "Erro ao criar horário", error: newError.message });
     }
   }
 }

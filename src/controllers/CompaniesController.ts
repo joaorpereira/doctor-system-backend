@@ -7,6 +7,10 @@ import { ICompanies, Status } from "../models/companies/companiesTypes";
 import { hashPassword, comparePassword } from "../services/hashPassword";
 import { generateToken, Role } from "../services/generateToken";
 
+type ErrorProps = {
+  message?: string;
+  statusCode?: number;
+};
 class CompaniesController {
   async login(req: Request, res: Response) {
     let statusCode = 404;
@@ -62,10 +66,11 @@ class CompaniesController {
         message: "Usuário logado com sucesso",
         user,
       });
-    } catch (error: any) {
+    } catch (error) {
+      const newError = error as unknown as ErrorProps;
       res.status(statusCode).send({
         message,
-        error: error.message,
+        error: newError.message,
       });
     }
   }
@@ -81,9 +86,10 @@ class CompaniesController {
         message: "Lista de empresas obtida com sucesso",
       });
     } catch (error) {
+      const newError = error as unknown as ErrorProps;
       res.status(404).send({
         message: "Lista de empresas não encontrada",
-        error: error.message,
+        error: newError.message,
       });
     }
   }
@@ -116,9 +122,10 @@ class CompaniesController {
         message: "Distância entre cliente e empresa obtida com sucesso",
       });
     } catch (error) {
+      const newError = error as unknown as ErrorProps;
       res.status(404).send({
         message: "Erro ao obter a distância entre cliente e empresa",
-        error: error.message,
+        error: newError.message,
       });
     }
   }
@@ -140,9 +147,10 @@ class CompaniesController {
         message: "Lista de empresas filtrada obtida com sucesso",
       });
     } catch (error) {
+      const newError = error as unknown as ErrorProps;
       res.status(404).send({
         message: "Erro ao filtrar lista de empresas",
-        error: error.message,
+        error: newError.message,
       });
     }
   }
@@ -238,9 +246,10 @@ class CompaniesController {
         message: "Empresa criada com sucesso",
       });
     } catch (error) {
+      const newError = error as unknown as ErrorProps;
       await session.abortTransaction();
       session.endSession();
-      res.status(404).send({ message, error: error.message });
+      res.status(404).send({ message, error: newError.message });
     }
   }
 
@@ -287,9 +296,10 @@ class CompaniesController {
         .status(200)
         .send({ data: newCompany, message: "Empresa alterada com sucesso" });
     } catch (error) {
+      const newError = error as unknown as ErrorProps;
       res.status(404).send({
         message: "Erro ao alterar dados da empresa",
-        error: error.message,
+        error: newError.message,
       });
     }
   }
@@ -300,9 +310,10 @@ class CompaniesController {
       await CompaniesModel.deleteOne({ _id: id });
       res.status(200).send({ message: "Empresa removida com sucesso" });
     } catch (error) {
+      const newError = error as unknown as ErrorProps;
       res
         .status(404)
-        .send({ message: "Erro ao remover empresa", error: error.message });
+        .send({ message: "Erro ao remover empresa", error: newError.message });
     }
   }
 }

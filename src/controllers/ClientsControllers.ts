@@ -11,6 +11,11 @@ import { CompanyClientModel } from "../models/relations/companyClient/companyCli
 import { hashPassword, comparePassword } from "../services/hashPassword";
 import { generateToken, Role } from "../services/generateToken";
 
+type ErrorProps = {
+  message?: string;
+  statusCode?: number;
+};
+
 class ClientsControllers {
   async login(req: Request, res: Response) {
     let statusCode = 404;
@@ -51,9 +56,10 @@ class ClientsControllers {
         .status(200)
         .send({ token, user: client, message: "Usuário logado com sucesso" });
     } catch (error) {
+      const newError = error as unknown as ErrorProps;
       res.status(statusCode).send({
         message,
-        error: error.message,
+        error: newError.message,
       });
     }
   }
@@ -65,9 +71,10 @@ class ClientsControllers {
       );
       res.status(200).send({ data: clients });
     } catch (error) {
+      const newError = error as unknown as ErrorProps;
       res.status(404).send({
         message: "Lista de clientes não encontrada",
-        error: error.message,
+        error: newError.message,
       });
     }
   }
@@ -81,9 +88,10 @@ class ClientsControllers {
 
       res.status(200).send({ data: client });
     } catch (error) {
+      const newError = error as unknown as ErrorProps;
       res
         .status(404)
-        .send({ message: "Cliente não encontrado", error: error.message });
+        .send({ message: "Cliente não encontrado", error: newError.message });
     }
   }
 
@@ -98,9 +106,10 @@ class ClientsControllers {
         .status(200)
         .send({ data: clients, message: "Lista de clientes encontrada" });
     } catch (error) {
+      const newError = error as unknown as ErrorProps;
       res
         .status(404)
-        .send({ message: "Cliente não encontrado", error: error.message });
+        .send({ message: "Cliente não encontrado", error: newError.message });
     }
   }
 
@@ -234,9 +243,10 @@ class ClientsControllers {
         message: "Cliente criado com sucesso",
       });
     } catch (error) {
+      const newError = error as unknown as ErrorProps;
       await session.abortTransaction();
       session.endSession();
-      res.status(404).send({ message, error });
+      res.status(404).send({ message, error: newError.message });
     }
   }
 
@@ -282,9 +292,10 @@ class ClientsControllers {
         .status(200)
         .send({ data: newClient, message: "Cliente alterado com sucesso" });
     } catch (error) {
+      const newError = error as unknown as ErrorProps;
       res.status(404).send({
         message: "Erro ao alterar dados do cliente",
-        error: error.message,
+        error: newError.message,
       });
     }
   }
@@ -296,9 +307,11 @@ class ClientsControllers {
       await CompanyClientModel.deleteOne({ client_id: id });
       res.status(200).send({ message: "Cliente removido com sucesso" });
     } catch (error) {
-      res
-        .status(404)
-        .send({ message: "Erro ao remover Cliente", error: error.message });
+      const newError = error as unknown as ErrorProps;
+      res.status(404).send({
+        message: "Erro ao remover Cliente",
+        error: newError.message,
+      });
     }
   }
 }

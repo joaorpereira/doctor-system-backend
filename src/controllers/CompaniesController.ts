@@ -268,16 +268,20 @@ class CompaniesController {
       }: ICompanies = req.body;
 
       const company = await CompaniesModel.findById(id).select(
-        " -updated_at -__v -password -bank_account"
+        " -updated_at -__v -bank_account"
       );
 
-      const hashedPassword = await hashPassword(password);
+      let hashedPassword = password;
+
+      if (password) {
+        hashedPassword = await hashPassword(password);
+      }
 
       const update = {
         ...rest,
         name: name ?? company?.name,
         password: hashedPassword ?? company?.password,
-        picture: picture ?? company?.name,
+        picture: picture ?? company?.picture,
         background: background ?? company?.background,
         phone_number: phone_number ?? company?.phone_number,
         geolocation: geolocation ?? company?.geolocation,
@@ -290,7 +294,7 @@ class CompaniesController {
         {
           returnOriginal: false,
         }
-      ).select(" -updated_at -__v");
+      ).select(" -updated_at -__v -password ");
 
       res
         .status(200)

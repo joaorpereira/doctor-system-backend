@@ -9,6 +9,7 @@ type ErrorProps = {
 };
 
 interface IBusboyRequest extends Request {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   files: any;
 }
 
@@ -32,7 +33,7 @@ class FilesController {
       const newError = error as unknown as ErrorProps;
       res
         .status(404)
-        .send({ message: "Erro ao remover arquivo", error: newError.message });
+        .send({ message: "Erro ao remover arquivo", error: newError });
     }
   }
 
@@ -41,15 +42,18 @@ class FilesController {
     const documentFile = (req as IBusboyRequest).files;
 
     const jsonService = JSON.parse(data);
-    if (!jsonService) {
-      throw new Error("Dados do serviço enviados de forma incorreta");
-    }
 
     const busboy = new Busboy({ headers: req.headers });
     const errors: IErrorAWS[] = [];
     let file = "";
 
     try {
+      if (!jsonService || !jsonService.id || !jsonService.role) {
+        throw new Error(
+          "Dados do enviados de forma incorreta. ID, Role e File são campos obrigatórios"
+        );
+      }
+
       // eslint-disable-next-line consistent-return
       busboy.on("finish", async () => {
         const objectKeysLength = Object.keys(documentFile).length as number;
@@ -74,6 +78,7 @@ class FilesController {
           const response = (await uploadToS3({
             file: newFile,
             path,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
           })) as any;
 
           if (response.error) {
@@ -107,8 +112,8 @@ class FilesController {
     } catch (error) {
       const newError = error as unknown as ErrorProps;
       res.status(404).send({
-        message: "Erro ao realizar upload do arquivo",
-        error: newError.message,
+        message: newError.message || "Erro ao realizar upload do arquivo",
+        error,
       });
     }
   }

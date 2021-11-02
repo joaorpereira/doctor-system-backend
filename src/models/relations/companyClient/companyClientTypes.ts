@@ -8,7 +8,7 @@ export enum Status {
 
 export type ICompanyClient = {
   client_id: string;
-  worker_id: string;
+  company_id: string;
   status: Status;
   created_at: Date;
   updated_at: Date;

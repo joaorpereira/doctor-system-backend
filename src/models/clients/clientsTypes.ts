@@ -1,6 +1,5 @@
 import { Document, Model } from "mongoose";
 import { Role } from "../../services/generateToken";
-import { ICompanies } from "../companies/companiesTypes";
 
 export enum Gender {
   MASCULINO = "MASCULINO",

@@ -6,11 +6,8 @@ import { pagarmeService } from "../services/pargar-me";
 import { ICompanies, Status } from "../models/companies/companiesTypes";
 import { hashPassword, comparePassword } from "../services/hashPassword";
 import { generateToken, Role } from "../services/generateToken";
+import { ErrorProps } from "../utils/error";
 
-type ErrorProps = {
-  message?: string;
-  statusCode?: number;
-};
 class CompaniesController {
   async login(req: Request, res: Response) {
     let statusCode = 404;
@@ -49,7 +46,7 @@ class CompaniesController {
         role: company.role as Role,
       });
 
-      const user = {
+      const data = {
         name: company.name,
         email: company.email,
         _id: company._id,
@@ -64,7 +61,7 @@ class CompaniesController {
       res.status(200).send({
         token,
         message: "Usuário logado com sucesso",
-        user,
+        data,
       });
     } catch (error) {
       const newError = error as unknown as ErrorProps;

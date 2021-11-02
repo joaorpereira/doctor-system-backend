@@ -1,5 +1,6 @@
 import { Document, Model } from "mongoose";
 import { Role } from "../../services/generateToken";
+import { ICompanies } from "../companies/companiesTypes";
 
 export enum Gender {
   MASCULINO = "MASCULINO",
@@ -42,6 +43,8 @@ export type IClients = {
   updated_at?: Date;
 };
 
-export interface IClientsDocument extends IClients, Document {}
+export interface IClientsDocument extends IClients, Document {
+  _doc: IClients;
+}
 
 export type IClientsModel = Model<IClientsDocument>;

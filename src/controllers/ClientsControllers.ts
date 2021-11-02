@@ -10,11 +10,8 @@ import {
 import { CompanyClientModel } from "../models/relations/companyClient/companyClientModel";
 import { hashPassword, comparePassword } from "../services/hashPassword";
 import { generateToken, Role } from "../services/generateToken";
-
-type ErrorProps = {
-  message?: string;
-  statusCode?: number;
-};
+import { ErrorProps } from "../utils/error";
+import { ICompanyClientProps } from "../models/relations/companyClient/companyClientTypes";
 
 class ClientsControllers {
   async login(req: Request, res: Response) {
@@ -52,9 +49,18 @@ class ClientsControllers {
         role: client.role as Role,
       });
 
+      const companyClient = await CompanyClientModel.findOne({
+        client_id: client?._id,
+      });
+
+      const data = {
+        ...client._doc,
+        company_id: companyClient?.company_id,
+      };
+
       res
         .status(200)
-        .send({ token, user: client, message: "Usuário logado com sucesso" });
+        .send({ token, data, message: "Usuário logado com sucesso" });
     } catch (error) {
       const newError = error as unknown as ErrorProps;
       res.status(statusCode).send({
@@ -82,11 +88,24 @@ class ClientsControllers {
   async getClient(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const client = await ClientsModel.findById(id).select(
-        " -updated_at -__v -password"
-      );
 
-      res.status(200).send({ data: client });
+      const client = (await CompanyClientModel.findOne({
+        client_id: id,
+      })
+        .populate([
+          { path: "client_id", select: "-password -updated_at -__v" },
+          { path: "company_id" },
+        ])
+        .select("-__v")) as unknown as ICompanyClientProps;
+
+      const data = {
+        ...client?.client_id._doc,
+        company_id: client?.company_id._id,
+      };
+
+      res.status(200).send({
+        data,
+      });
     } catch (error) {
       const newError = error as unknown as ErrorProps;
       res
@@ -235,6 +254,7 @@ class ClientsControllers {
         document: client?.document ?? newClient?.document,
         address: client?.address ?? newClient?.address,
         customer_id: client?.customer_id ?? newClient?.customer_id,
+        company_id,
       };
 
       res.status(201).send({

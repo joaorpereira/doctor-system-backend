@@ -6,12 +6,9 @@ import { WorkerServiceModel } from "../models/relations/workerService/workerServ
 import { Status } from "../models/relations/companyWorker/companyWorkerTypes";
 import { pagarmeService } from "../services/pargar-me";
 import { IWorkers } from "../models/workers/workersTypes";
-import {
-  IWorkerData,
-  ICompanyWorkers,
-} from "../models/relations/workerService/workerServiceTypes";
 import { hashPassword, comparePassword } from "../services/hashPassword";
 import { generateToken } from "../services/generateToken";
+import { ErrorProps } from "../utils/error";
 
 class WorkersController {
   async login(req: Request, res: Response) {
@@ -49,7 +46,7 @@ class WorkersController {
         role: worker.role,
       });
 
-      const user = {
+      const data = {
         _id: worker._id,
         bank_account: worker.bank_account,
         role: worker.role,
@@ -60,13 +57,14 @@ class WorkersController {
 
       res.status(200).send({
         token,
-        user,
+        data,
         message: "Colaborador logado com sucesso",
       });
     } catch (error) {
+      const newError = error as unknown as ErrorProps;
       res.status(statusCode).send({
         message,
-        error: error.message,
+        error: newError.message,
       });
     }
   }
@@ -94,7 +92,11 @@ class WorkersController {
 
       res.status(200).send({ data: worker });
     } catch (error) {
-      res.status(404).send({ message: "Colaborador não encontrado", error });
+      const newError = error as unknown as ErrorProps;
+      res.status(404).send({
+        message: "Colaborador não encontrado",
+        error: newError.message,
+      });
     }
   }
 
@@ -241,9 +243,10 @@ class WorkersController {
         message: "Colaborador criado com sucesso",
       });
     } catch (error) {
+      const newError = error as unknown as ErrorProps;
       await session.abortTransaction();
       session.endSession();
-      res.status(404).send({ message, error: error.message });
+      res.status(404).send({ message, error: newError.message });
     }
   }
 
@@ -283,9 +286,11 @@ class WorkersController {
         .status(200)
         .send({ data: newWorker, message: "Colaborador alterado com sucesso" });
     } catch (error) {
-      res
-        .status(404)
-        .send({ message: "Erro ao alterar colaborador", error: error.message });
+      const newError = error as unknown as ErrorProps;
+      res.status(404).send({
+        message: "Erro ao alterar colaborador",
+        error: newError.message,
+      });
     }
   }
 
@@ -296,9 +301,11 @@ class WorkersController {
       await CompanyWorkerModel.deleteOne({ worker_id: id });
       res.status(200).send({ message: "Colaborador removido com sucesso" });
     } catch (error) {
-      res
-        .status(404)
-        .send({ message: "Erro ao remover colaborador", error: error.message });
+      const newError = error as unknown as ErrorProps;
+      res.status(404).send({
+        message: "Erro ao remover colaborador",
+        error: newError.message,
+      });
     }
   }
 
@@ -322,9 +329,10 @@ class WorkersController {
         data: list,
       });
     } catch (error) {
+      const newError = error as unknown as ErrorProps;
       res.status(404).send({
         message: "Lista de colaboradores não encontrada",
-        error: error.message,
+        error: newError.message,
       });
     }
   }
